@@ -1,6 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetTalk", "NetTalk\NetTalk.csproj", "{31C997C5-13B8-4B96-9365-9E0428DAB351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{31C997C5-13B8-4B96-9365-9E0428DAB351}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{A382FD80-444F-464C-B7EB-3D8540A6AB25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{F99C64F3-7AE2-4784-88EF-FFA10197CA15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{E72CED95-07FD-4C75-955B-01D3B2C381F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +20,21 @@ Global
 		{31C997C5-13B8-4B96-9365-9E0428DAB351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31C997C5-13B8-4B96-9365-9E0428DAB351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31C997C5-13B8-4B96-9365-9E0428DAB351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A382FD80-444F-464C-B7EB-3D8540A6AB25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A382FD80-444F-464C-B7EB-3D8540A6AB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A382FD80-444F-464C-B7EB-3D8540A6AB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A382FD80-444F-464C-B7EB-3D8540A6AB25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F99C64F3-7AE2-4784-88EF-FFA10197CA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F99C64F3-7AE2-4784-88EF-FFA10197CA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F99C64F3-7AE2-4784-88EF-FFA10197CA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F99C64F3-7AE2-4784-88EF-FFA10197CA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E72CED95-07FD-4C75-955B-01D3B2C381F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E72CED95-07FD-4C75-955B-01D3B2C381F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E72CED95-07FD-4C75-955B-01D3B2C381F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E72CED95-07FD-4C75-955B-01D3B2C381F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

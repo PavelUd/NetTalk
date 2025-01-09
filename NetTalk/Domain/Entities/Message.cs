@@ -1,6 +1,16 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public class Message
+[Table("messages")]
+public class Message : BaseAuditableEntity
 {
+    [Column("id_chat")]
+    public int IdChat { get; set; }
     
+    [Column("text")]
+    public string Text { get; set; }
+    public List<File> Files { get; set; }
+    public List<MessageStatus> StatusList { get; set; }
 }

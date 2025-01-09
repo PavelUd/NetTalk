@@ -1,8 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Persistence.Contexts;
+using Persistence.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddPersistenceLayer(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,8 +21,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthorization();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NetTalkContext>();
+    var pendingMigrations = dbContext.Database.GetPendingMigrations();
+
+    if (pendingMigrations.Any())
+    {
+        dbContext.Database.Migrate();
+    }
+
+}
 
 app.MapControllerRoute(
     name: "default",

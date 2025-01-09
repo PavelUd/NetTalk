@@ -1,0 +1,43 @@
+﻿
+  <div class="container-fluid vh-100 d-flex flex-column">
+    <div class="row flex-grow-1">
+      <!-- Sidebar -->
+      <aside class="col-3 bg-light border-end">
+        <button class="btn btn-secondary m-3 d-md-none" data-bs-toggle="offcanvas" data-bs-target="#chatList">
+          Показать список чатов
+        </button>
+        
+        <!-- Шторка для списка чатов -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="chatList" aria-labelledby="chatListLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="chatListLabel">История чатов</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <div id="chat-list" class="list-group">
+              <a href="#" class="list-group-item list-group-item-action">Пользователь 1</a>
+              <a href="#" class="list-group-item list-group-item-action">Пользователь 2</a>
+              <a href="#" class="list-group-item list-group-item-action">Пользователь 3</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Chat window -->
+      <main class="col-9 d-flex flex-column">
+        <div class="border-bottom p-3 bg-light">
+          <h5>Переписка с Пользователь 1</h5>
+        </div>
+        <div id="messages" class="flex-grow-1 p-3 overflow-auto">
+          <!-- Messages will appear here -->
+        </div>
+        <div class="p-3 border-top bg-light">
+          <form id="message-form" class="d-flex align-items-center">
+            <input type="file" id="file-input" class="form-control me-2" style="max-width: 200px;">
+            <input type="text" id="message-input" class="form-control me-2" placeholder="Введите сообщение...">
+            <button type="submit" class="btn btn-primary">Отправить</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>

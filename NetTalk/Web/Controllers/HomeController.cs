@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Application.Chat.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NetTalk.Models;
 
@@ -7,14 +9,20 @@ namespace NetTalk.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    private readonly IMediator _mediator;
+    public HomeController(ILogger<HomeController> logger, IMediator mediator)
     {
         _logger = logger;
+        _mediator = mediator;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        var query = new GetChatByIdQuery()
+        {
+            Id = 1
+        };
+       var result = await _mediator.Send(query);
         return View();
     }
 

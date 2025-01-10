@@ -10,7 +10,7 @@ using Persistence.Contexts;
 
 namespace Persistence.Migrations
 {
-    [DbContext(typeof(NetTalkContext))]
+    [DbContext(typeof(NetTalkDbContext))]
     partial class NetTalkContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -74,7 +74,7 @@ namespace Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("IdChat")
+                    b.Property<int>("ChatId")
                         .HasColumnType("integer")
                         .HasColumnName("id_chat");
 
@@ -157,7 +157,7 @@ namespace Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("IdChat")
+                    b.Property<int>("ChatId")
                         .HasColumnType("integer")
                         .HasColumnName("id_chat");
 
@@ -174,7 +174,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.HasIndex("IdChat");
+                    b.HasIndex("ChatId");
 
                     b.ToTable("messages");
                 });
@@ -281,7 +281,7 @@ namespace Persistence.Migrations
 
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany()
-                        .HasForeignKey("IdChat")
+                        .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

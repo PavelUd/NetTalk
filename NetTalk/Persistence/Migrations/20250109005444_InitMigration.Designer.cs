@@ -11,7 +11,7 @@ using Persistence.Contexts;
 
 namespace Persistence.Migrations
 {
-    [DbContext(typeof(NetTalkContext))]
+    [DbContext(typeof(NetTalkDbContext))]
     [Migration("20250109005444_InitMigration")]
     partial class InitMigration
     {

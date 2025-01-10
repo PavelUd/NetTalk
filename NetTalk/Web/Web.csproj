@@ -15,7 +15,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Persistence\Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Authentication\Register.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Authentication\SingIn.cshtml" />
     </ItemGroup>
 
 </Project>

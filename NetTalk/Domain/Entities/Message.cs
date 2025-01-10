@@ -7,7 +7,7 @@ namespace Domain.Entities;
 public class Message : BaseAuditableEntity
 {
     [Column("id_chat")]
-    public int IdChat { get; set; }
+    public int ChatId { get; set; }
     
     [Column("text")]
     public string Text { get; set; }

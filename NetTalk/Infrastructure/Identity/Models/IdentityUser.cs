@@ -19,13 +19,13 @@ public class IdentityUser : IUser
         _httpContextAccessor = httpContextAccessor;
     }
     
-    public long Id
+    public int Id
     {
         get
         {
             var value = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value;
             if (value != null)
-                return long.Parse(value);
+                return int.Parse(value);
             return 0;
         }
         init { }

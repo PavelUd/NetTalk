@@ -18,12 +18,23 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var query = new GetChatByIdQuery()
+        var query = new GetChatsQuery()
         {
             Id = 1
         };
        var result = await _mediator.Send(query);
-        return View();
+       return View(result.Data);
+    }
+    
+    [Route("chats/{id}")]
+    public async Task<IActionResult> Chat(int id)
+    {
+        var query = new GetChatByIdQuery()
+        {
+            Id = 1
+        };
+        var result = await _mediator.Send(query);
+        return View(result.Data);
     }
 
     public IActionResult Privacy()

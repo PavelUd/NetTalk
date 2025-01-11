@@ -12,7 +12,7 @@ public class Chat : BaseAuditableEntity
     public string Name { get; set; }
     
     [Column("chat_type")]
-    public ChatType Type { get; set; }
+    public string Type { get; set; }
     
     [Column("is_active")]
     public bool IsActive { get; set; }

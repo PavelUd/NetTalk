@@ -1,4 +1,5 @@
 class AuthApiService{
+    
     async _load(data, url) {
         const response = await fetch(`https://localhost:7235/${url}`,{
             method: 'POST',
@@ -22,12 +23,12 @@ class AuthModel
 
     async login(authData) {
         const response = await this.#service._load(authData, "login");
-        return response;
+        return response.json();
     }
 
     async register(authData) {
         const response = await this.#service._load(authData, "register");
-        return response;
+        return response.json();
     }
 }
 
@@ -43,6 +44,13 @@ class AuthPresenter{
         this.#authElem.bindRegister(this.handleRegister.bind(this));
     }
 
+    decodeJwtToken = (token) =>{
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payloadinit = atob(base64);
+        return JSON.parse(payloadinit);
+    }
+    
     async handleRegister(username, password, fullname) {
         const result = await this.#authModel.register(
             {
@@ -51,11 +59,13 @@ class AuthPresenter{
                 fullname: fullname,
             }
         );
-        if (!result.ok) {
+        if (!result.succeeded) {
             this.#authElem.showMessage("danger", "Ошибка Регистрации");
         }
         else {
-            window.location.href = '/'
+            let user = this.decodeJwtToken(result.data)
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/';
         }
     }
     async handleLogin(username, password) {
@@ -65,10 +75,12 @@ class AuthPresenter{
                 password: password
             }
         );
-        if (!result.ok) {
+        if (!result.succeeded) {
             this.#authElem.showMessage("danger", "Ошибка авторизации. Проверьте логин и пароль!!");
         } 
         else {
+            let user = this.decodeJwtToken(result.data)
+            localStorage.setItem('user', JSON.stringify(user));
             window.location.href = '/'
         }
     }

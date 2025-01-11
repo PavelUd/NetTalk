@@ -176,7 +176,7 @@ namespace Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_messages_ChatId",
                 table: "messages",
-                column: "ChatId");
+                column: "IdChat");
 
             migrationBuilder.CreateIndex(
                 name: "IX_messages_id_chat",

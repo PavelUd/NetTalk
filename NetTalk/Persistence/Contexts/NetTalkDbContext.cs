@@ -24,9 +24,10 @@ public class NetTalkDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Chat>().HasMany<Message>()
+        modelBuilder.Entity<Chat>()
+            .HasMany(c => c.Messages)
             .WithOne()
-            .HasForeignKey(m => m.ChatId);
+            .HasForeignKey(s => s.IdChat);
         
         modelBuilder.Entity<Message>()
             .HasMany(m => m.StatusList)

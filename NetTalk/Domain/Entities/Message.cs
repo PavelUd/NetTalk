@@ -7,10 +7,13 @@ namespace Domain.Entities;
 public class Message : BaseAuditableEntity
 {
     [Column("id_chat")]
-    public int ChatId { get; set; }
+    public int IdChat { get; set; }
     
     [Column("text")]
     public string Text { get; set; }
+    
+    [Column("id_user")]
+    public int IdUser { get; set; }
     public List<File> Files { get; set; }
     public List<MessageStatus> StatusList { get; set; }
 }

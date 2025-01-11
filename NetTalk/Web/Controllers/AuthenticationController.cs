@@ -50,7 +50,7 @@ public class AuthenticationController : Controller
         if (token.Succeeded)
         {
             _httpContextAccessor.HttpContext.Session.SetString("AuthToken", token.Data);
-            return Ok();
+            return Ok(token);
         }
 
         return Unauthorized(new { message = token.Errors });
@@ -74,7 +74,7 @@ public async Task<IActionResult> Login([FromBody] UserLoginModel model)
     if (token.Succeeded)
     {
         _httpContextAccessor.HttpContext.Session.SetString("AuthToken", token.Data);
-        return Ok();
+        return Ok(token);
     }
 
     return Unauthorized(new { message = "Неверный логин или пароль" });

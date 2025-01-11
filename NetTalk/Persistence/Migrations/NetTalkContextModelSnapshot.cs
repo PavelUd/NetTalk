@@ -74,7 +74,7 @@ namespace Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("ChatId")
+                    b.Property<int>("IdChat")
                         .HasColumnType("integer")
                         .HasColumnName("id_chat");
 
@@ -150,14 +150,14 @@ namespace Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChatId")
+                    b.Property<int?>("IdChat")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("ChatId")
+                    b.Property<int>("IdChat")
                         .HasColumnType("integer")
                         .HasColumnName("id_chat");
 
@@ -172,9 +172,9 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("IdChat");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("IdChat");
 
                     b.ToTable("messages");
                 });
@@ -251,13 +251,13 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("users_chats", b =>
                 {
-                    b.Property<int>("ChatId")
+                    b.Property<int>("IdChat")
                         .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("ChatId", "UserId");
+                    b.HasKey("IdChat", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -277,11 +277,11 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany("Messages")
-                        .HasForeignKey("ChatId");
+                        .HasForeignKey("IdChat");
 
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany()
-                        .HasForeignKey("ChatId")
+                        .HasForeignKey("IdChat")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -299,7 +299,7 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany()
-                        .HasForeignKey("ChatId")
+                        .HasForeignKey("IdChat")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

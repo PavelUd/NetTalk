@@ -1,7 +1,9 @@
 using Application.Extensions;
+using Application.Interfaces;
 using Infrastructure.Extensions;
 using Infrastructure.Identity.Models;
 using Microsoft.EntityFrameworkCore;
+using NetTalk.Hubs;
 using NetTalk.Middlewares;
 using Persistence.Contexts;
 using Persistence.Extensions;
@@ -10,7 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
+builder.Services.AddSignalR();
 builder.Services.Configure<Token>(builder.Configuration.GetSection("token"));
+builder.Services.AddScoped<IUser, IdentityUser>();
 builder.Services.AddPersistenceLayer(builder.Configuration);
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.AddApplicationLayer();
@@ -28,6 +32,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseStaticFiles();
+
 app.UseSession();
 app.UseAuthorization();
 app.UseMiddleware<JwtTokenMiddleware>();
@@ -46,5 +51,8 @@ using (var scope = app.Services.CreateScope())
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chathub");
+});
 app.Run();

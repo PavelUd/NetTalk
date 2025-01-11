@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="Authentication\Dto\" />
-      <Folder Include="Chat\Commands\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -19,7 +19,7 @@ public class User : BaseEntity
     public string Salt { get; set; }
     
     [Column("avatar_url")]
-    public string AvtarUrl { get; set; }
+    public string AvatarUrl { get; set; }
     
     [Column("is_active")]
     public bool IsActive { get; set; }

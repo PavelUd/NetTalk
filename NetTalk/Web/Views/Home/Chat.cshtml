@@ -37,7 +37,7 @@
                       else
                       {
                         <div class="d-flex flex-row justify-content-start">
-                          <img src=" @Model.Chat.Users.First(us => us.Id == message.IdUser).AvtarUrl"
+                          <img src=" @Model.Chat.Users.First(us => us.Id == message.IdUser).AvatarUrl"
                                alt="avatar 1" style="width: 45px; height: 100%;">
                           <div>
                             <p class="small p-2 ms-3 mb-1 rounded-3" style="background: #bebebf">@message.Text</p>
@@ -65,4 +65,5 @@
   </div>
 
 </section>
+<script  src="@Url.Content("~/js/add-chat-script.js")" type="module" asp-append-version="true"></script>
 <script  src="@Url.Content("~/js/web-socket-conection.js")" type="module" asp-append-version="true"></script>

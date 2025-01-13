@@ -1,3 +1,4 @@
+using Application.Chat.Commands;
 using Application.Chat.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ public class ChatController : Controller
         _httpContextAccessor = httpContextAccessor;
     }
 
-    [HttpGet("chats-data/{id}")] 
+    [HttpGet("api/chats/{id}")] 
     public async Task<IActionResult> GetChatById(int id)
     {
         var query = new GetChatByIdQuery
@@ -28,4 +29,12 @@ public class ChatController : Controller
         var result = await _mediator.Send(query);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
+    
+    [HttpPost("api/chats")]
+    public async Task<IActionResult> CreateChat([FromBody] CreateChatCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+    
 }

@@ -216,7 +216,7 @@ namespace Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvtarUrl")
+                    b.Property<string>("AvatarUrl")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("avatar_url");

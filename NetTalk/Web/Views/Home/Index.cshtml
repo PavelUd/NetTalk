@@ -1,5 +1,5 @@
 ﻿@using Application.Chat.Dto
-@model List<ChatSummary>
+@model ChatListModel
 @{
   var id = int.Parse(Context.User.Claims.FirstOrDefault(cl => cl.Type == "Id")?.Value);
   var url = Context.User.Claims.FirstOrDefault(cl => cl.Type == "PhotoUrl")?.Value;
@@ -29,5 +29,5 @@
   </div>
 
 </section> 
-<script  src="@Url.Content("~/js/web-socket-conection.js")" type="module" asp-append-version="true"></script>
+<script  src="@Url.Content("~/js/add-chat-script.js")" type="module" asp-append-version="true"></script>
 <script src="~/js/chat-main.js" type="module" asp-append-version="true"></script>

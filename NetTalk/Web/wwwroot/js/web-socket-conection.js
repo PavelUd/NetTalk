@@ -1,12 +1,15 @@
+const url = window.location.href; // "https://localhost:7235/chats/1"
+const chatId = url.match(/\/chats\/(\d+)/)?.[1];
+let connection
+if(!isNaN(chatId)) {
+    connection = new signalR.HubConnectionBuilder()
+        .withUrl(`/chathub`)
+        .build();
 
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`/chathub`) 
-    .build();
-
-await connection.start()
-    .then(() => connection.invoke("JoinPrivateChat", "1")
-    .catch(err => console.error(err.toString())));
-
+    await connection.start()
+        .then(() => connection.invoke("JoinPrivateChat", chatId)
+            .catch(err => console.error(err.toString())));
+}
 const initSelfMessage = (message, url) => {
     console.log(message.Text);
    return `<div class="d-flex flex-row justify-content-end">

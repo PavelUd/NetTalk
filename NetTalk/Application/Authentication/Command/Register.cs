@@ -46,7 +46,7 @@ internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordE
                 Password = passwordHash,
                 Salt = salt,
                 FullName = request.FullName,
-                AvtarUrl = _avatars[random.Next(_avatars.Count)],
+                AvatarUrl = _avatars[random.Next(_avatars.Count)],
                 LastOnline = DateTime.Now.ToUniversalTime(),
                 Key = new SymmetricKey()
                 {

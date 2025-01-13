@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Application.Chat.Dto;
 using Application.Chat.Queries;
+using Application.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NetTalk.Models;
@@ -20,7 +21,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var chats = await GetUserChats();
+        var chats = await GetChatsList();
        return View(chats);
     }
     
@@ -39,7 +40,7 @@ public class HomeController : Controller
         var chatViewModel = new ChatViewModel()
         {
             Chat = result.Data,
-            AllChats = await GetUserChats()
+            AllChats = await GetChatsList()
         };
         return View(chatViewModel);
     }
@@ -55,10 +56,17 @@ public class HomeController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    private async Task<List<ChatSummary>> GetUserChats()
+    private async Task<ChatListModel> GetChatsList()
     {
         var query = new GetChatsQuery();
+        var usersQuery = new GetAllUsersQuery();
+        var userResult = await _mediator.Send(usersQuery);
         var result = await _mediator.Send(query);
-        return  result.Data;
+        var model = new ChatListModel()
+        {
+            Chats = result.Data,
+            OtherUsers = userResult.Data
+        };
+        return model;
     }
 }

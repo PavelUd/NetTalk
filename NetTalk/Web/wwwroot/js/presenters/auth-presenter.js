@@ -13,20 +13,22 @@ export default class AuthPresenter{
     }
 
     async handleRegister(username, password, fullname) {
-        const result = await this.#authModel.register(
-            {
-                login: username,
-                password: password,
-                fullname: fullname,
-            }
-        );
-        if (!result.succeeded) {
-            this.#authElem.showMessage("danger", "Ошибка Регистрации");
-        }
-        else {
+        try {
+            const result = await this.#authModel.register(
+                {
+                    login: username,
+                    password: password,
+                    fullname: fullname,
+                }
+            );
+
             let user = decodeJwtToken(result.data)
             localStorage.setItem('user', JSON.stringify(user));
             window.location.href = '/';
+
+        }
+    catch (e){
+            this.#authElem.showMessage("danger", "Ошибка Регистрации");
         }
     }
     async handleLogin(username, password) {

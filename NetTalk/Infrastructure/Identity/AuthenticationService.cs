@@ -74,7 +74,7 @@ public class AuthenticationService : IAuthenticationService
                 new Claim("Id", user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Login),
                 new Claim("FullName", user.FullName),
-                new Claim("PhotoUrl", user.AvtarUrl),
+                new Claim("PhotoUrl", user.AvatarUrl),
             }),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature)
         };

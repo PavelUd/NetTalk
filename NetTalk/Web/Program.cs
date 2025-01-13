@@ -13,6 +13,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
 builder.Services.AddSignalR();
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddUserSecrets<Program>()
+    .Build();
 builder.Services.Configure<Token>(builder.Configuration.GetSection("token"));
 builder.Services.AddScoped<IUser, IdentityUser>();
 builder.Services.AddPersistenceLayer(builder.Configuration);

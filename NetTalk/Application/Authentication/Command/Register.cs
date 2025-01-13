@@ -14,29 +14,50 @@ public record RegisterCommand : IRequest<Result<string>>
     public string FullName { get; set; }
 }
 
-internal class  RegisterCommandHandler(IAuthenticationService service, IUnitOfWork unitOfWork)
+
+internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordEncryptor encryptionService,
+        ISymmetricKeyEncryptor keyEncryptor, IUnitOfWork unitOfWork)
     : IRequestHandler<RegisterCommand, Result<string>>
 {
+    private readonly List<string> _avatars = new List<string>()
+    {
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp",
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp",
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp",
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp",
+        "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
+    };
     public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
+        var random = new Random();
         try
         {
-            if (!IsUSerCorrect(request.Login))
+            if (!IsUniqueLogin(request.Login))
             {
                 return await Result<string>.FailureAsync("Пользователь с таким логином уже есть");
             }
 
-            var user = new User()
+            var (passwordHash, salt) = encryptionService.PasswordEncryption(request.Password);
+            var (key, iv) = keyEncryptor.GenerateKey();
+            var user = new User
             {
                 Login = request.Login,
-                Password = request.Password,
+                Password = passwordHash,
+                Salt = salt,
                 FullName = request.FullName,
-                AvtarUrl = "y"
+                AvtarUrl = _avatars[random.Next(_avatars.Count)],
+                LastOnline = DateTime.Now.ToUniversalTime(),
+                Key = new SymmetricKey()
+                {
+                    IV = iv,
+                    Key = key
+                }
             };
+            
             await unitOfWork.UserRepository.AddAsync(user);
             unitOfWork.Commit();
-            var token = await service.Authenticate(user);
-            return await Result<string>.SuccessAsync(token);
+            return await service.Authenticate(request.Login, request.Password);
         }
         catch (Exception e)
         {
@@ -44,7 +65,7 @@ internal class  RegisterCommandHandler(IAuthenticationService service, IUnitOfWo
         }
     }
 
-    private bool IsUSerCorrect(string login)
+    private bool IsUniqueLogin(string login)
     {
         return !unitOfWork.UserRepository.FindAll().Any(u => u.Login == login);
     }

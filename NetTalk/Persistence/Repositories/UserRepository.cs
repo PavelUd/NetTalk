@@ -9,4 +9,5 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     public UserRepository(NetTalkDbContext context) : base(context)
     {
     }
+    
 }

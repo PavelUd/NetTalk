@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Infrastructure.Encryption;
 using Infrastructure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IPasswordEncryptor, PasswordEncryptor>();
+        services.AddScoped<ISymmetricKeyEncryptor, SymmetricKeyEncryptor>();
+        services.AddScoped<IMessageEncryptor, MessageEncryptor>();
     }
 
 }

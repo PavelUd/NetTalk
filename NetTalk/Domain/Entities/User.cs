@@ -15,6 +15,9 @@ public class User : BaseEntity
     [Column("full_name")]
     public string FullName { get; set; }
     
+    [Column("salt")]
+    public string Salt { get; set; }
+    
     [Column("avatar_url")]
     public string AvtarUrl { get; set; }
     
@@ -24,5 +27,6 @@ public class User : BaseEntity
     [Column("last_online")]
     public DateTime LastOnline{ get; set; }
     
+    public SymmetricKey Key{ get; set; }
     public List<Chat> Chats{ get; set; }
 }

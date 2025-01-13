@@ -9,6 +9,7 @@ public class NetTalkDbContext : DbContext
 {
 
     public DbSet<Chat> Chats { get; set; }
+    public DbSet<SymmetricKey> SymmetricKeys { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<MessageStatus> MessageStatuses { get; set; }
@@ -38,6 +39,10 @@ public class NetTalkDbContext : DbContext
             .HasMany(m => m.Files)
             .WithOne()
             .HasForeignKey(s => s.IdMessage);
+        modelBuilder.Entity<User>()
+            .HasOne(us => us.Key)
+            .WithOne()
+            .HasForeignKey<SymmetricKey>(k => k.IdUser);
         
         modelBuilder.Entity<Chat>()
             .HasMany(c => c.Users)  

@@ -1,6 +1,11 @@
+
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chathub")
+    .withUrl(`/chathub`) 
     .build();
+
+await connection.start()
+    .then(() => connection.invoke("JoinPrivateChat", "1")
+    .catch(err => console.error(err.toString())));
 
 const initSelfMessage = (message, url) => {
     console.log(message.Text);
@@ -49,8 +54,6 @@ connection.on("ReceiveMessage", (data, url) => {
     messagesList.innerHTML += msgDiv;
     container.scrollTop = container.scrollHeight;
 });
-
-connection.start().catch(err => console.error(err.toString()));
 
 document.getElementById("sendMessageButton").addEventListener("click", () => {
     const messageElement = document.getElementById("exampleFormControlInput2");

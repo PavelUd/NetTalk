@@ -2,7 +2,6 @@
 <html lang="ru" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
-    <title>@ViewData["Title"] - Web</title>
     <link href="https://cdn.jsdelivr.net/npm/mdb-ui-kit/css/mdb.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.6.0/css/all.css">
@@ -12,14 +11,14 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div  class="container d-flex justify-content-center align-items-center mb-4">
-    <div id="alertBox"></div>
+<div  id="alertContainer"  class="container d-flex justify-content-center align-items-center mb-4" style="display: none; position: fixed; right: 15%;">
+    <div id="alertBox" class="" role="alert"></div>
 </div>
+
+@RenderBody()
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.9/signalr.min.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.9/signalr.min.js"></script>
-@RenderBody()
-
-@await RenderSectionAsync("Scripts", required: false)
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

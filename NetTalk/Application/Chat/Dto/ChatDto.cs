@@ -12,7 +12,7 @@ public class ChatDto
     public int Owner { get; set; }
     public List<User> Users { get; set; }
     
-    public List<Message> Messages { get; set; }
+    public List<MessageDto> Messages { get; set; }
     private class Mapping : Profile
     {
         public Mapping()

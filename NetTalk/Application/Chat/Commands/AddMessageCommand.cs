@@ -10,33 +10,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Chat.Commands;
 
-public record AddMessageCommand : IRequest<Result<Message>>
+public record AddMessageCommand : IRequest<Result<MessageDto>>
 {
     public int IdChat { get; set; }
     public string Text { get; set; }
 }
 
-internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Result<Message>>
+internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Result<MessageDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUser _user;
+    private readonly IMessageEncryptor _encryptor;
 
-    public AddMessageCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IUser user)
+    public AddMessageCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IUser user, IMessageEncryptor encryptor)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _user = user;
+        _encryptor = encryptor;
     }
 
-    public async Task<Result<Message>> Handle(AddMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Result<MessageDto>> Handle(AddMessageCommand request, CancellationToken cancellationToken)
     {
+        
         try
         {
+            var encryptedMessage = await EncryptMessage(request.Text);
+            if (!encryptedMessage.Succeeded)
+            {
+                return await Result<MessageDto>.FailureAsync(encryptedMessage.Errors);
+            }
             var message = new Message()
             {
                 IdChat = request.IdChat,
-                Text = request.Text,
+                Text = encryptedMessage.Data,
                 UpdatedDate = DateTime.Now.ToUniversalTime(),
                 CreatedDate = DateTime.Now.ToUniversalTime(),
                 IdUser = _user.Id
@@ -44,11 +52,24 @@ internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Res
             var chat = _unitOfWork.ChatRepository.FindByCondition(us => us.Id == request.IdChat).Include(c => c.Messages).First();
             chat.Messages.Add(message);
             _unitOfWork.Commit();
-            return await Result<Message>.SuccessAsync(message);
+            var dto = new MessageDto(message, request.Text);
+            return await Result<MessageDto>.SuccessAsync(dto);
         }
         catch (Exception e)
         {
-            return await Result<Message>.FailureAsync(e.Message);
+            return await Result<MessageDto>.FailureAsync(e.Message);
         }
     }
+
+    private async Task<Result<byte[]>> EncryptMessage(string message)
+    {
+        var user = _unitOfWork.UserRepository.FindByCondition(us => _user.Id == us.Id).Include(us => us.Key).FirstOrDefault();
+        var iv = user.Key.IV;
+        var key = user.Key.Key;
+        var encryptMessage = _encryptor.EncryptMessage(key, iv, message);
+        return await Result<byte[]>.SuccessAsync(encryptMessage);
+    }
+    
+    
+    
 }

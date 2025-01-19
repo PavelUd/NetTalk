@@ -1,7 +1,9 @@
 using Application.Chat.Commands;
 using Application.Chat.Queries;
+using Application.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NetTalk.Models;
 
 namespace NetTalk.Controllers;
 
@@ -30,10 +32,26 @@ public class ChatController : Controller
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
     
+    [HttpGet("api/chats")] 
+    public async Task<IActionResult> GetChats()
+    {
+        var query = new GetChatsQuery();
+        var result = await _mediator.Send(query);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+    
+    
     [HttpPost("api/chats")]
     public async Task<IActionResult> CreateChat([FromBody] CreateChatCommand command)
     {
         var result = await _mediator.Send(command);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+    
+    [HttpGet("api/chats/search")]
+    public async Task<IActionResult> SearchChat([FromQuery] GetUsersByLoginQuery query)
+    {
+        var result = await _mediator.Send(query);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
     

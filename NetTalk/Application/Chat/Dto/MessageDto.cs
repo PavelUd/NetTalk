@@ -9,19 +9,23 @@ public class MessageDto
     
     public string Text { get; set; }    
     
-    public int IdUser { get; set; }
-    
+    public MessageUserDto User { get; set; }
     public DateTime? CreatedDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
     
     public MessageDto(){}
 
-    public MessageDto(Message message, string text)
+    public MessageDto(Message message, string text, User user)
     {
         Id = message.Id;
         IdChat = message.IdChat;
-        IdUser = message.IdUser;
+        User = new MessageUserDto()
+        {
+            IdUser = user.Id,
+            Name = user.FullName,
+            Url = user.AvatarUrl
+        };
         Text = text;
         CreatedDate = message.CreatedDate;
         UpdatedDate = message.UpdatedDate;

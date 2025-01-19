@@ -36,7 +36,7 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
         {
             var chat = _unitOfWork.ChatRepository
                 .FindByCondition(c => c.Id == request.Id)
-                .Include(c => c.Users)
+                .Include(c => c.Users).ThenInclude(u => u.Key)
                 .Include(c => c.Messages)
                 .FirstOrDefault();
             if (chat == null || chat.Users.All(us => us.Id != _user.Id))
@@ -47,11 +47,11 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
             var chatDto = new ChatDto()
             {
                 Id = chat.Id,
-                Name = chat.Name,
+                Name = chat.Users.First(us => us.Id != _user.Id).FullName,
+                Url = chat.Users.First(us => us.Id != _user.Id).AvatarUrl,
                 IsActive = chat.IsActive,
                 Owner = chat.Owner,
-                Users = chat.Users,
-                Messages = DecodeMessages(chat.Messages).ToList()
+                Messages = DecodeMessages(chat.Messages, chat.Users).OrderBy(c => c.CreatedDate).ToList()
             };
             return await Result<ChatDto>.SuccessAsync(chatDto);
         }
@@ -61,27 +61,30 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
         }
     }
 
-    private IEnumerable<MessageDto> DecodeMessages(List<Message> messages)
+    private IEnumerable<MessageDto> DecodeMessages(List<Message> messages, List<User> users)
     {
-        var userKeysDictionary = new Dictionary<int, (byte[], byte[])>();
+        var userKeysDictionary = new Dictionary<int, User>();
         foreach (var message in messages)
         {
             var key = Array.Empty<byte>();
             var iv = Array.Empty<byte>();
-            if(userKeysDictionary.TryGetValue(message.IdUser, out var tokenData))
+            User user;
+            if(userKeysDictionary.TryGetValue(message.IdUser, out var data))
             {
-                key = tokenData.Item1;
-                iv = tokenData.Item2;
+                user = data;
+                key = data.Key.Key;
+                iv = data.Key.IV;
             }
             else
             {
-                var keyData = _unitOfWork.UserRepository.FindByCondition(us => us.Id == message.IdUser).Include(us => us.Key).First().Key;
-                userKeysDictionary.Add(message.IdUser, (keyData.Key, keyData.IV));
-                key = keyData.Key;
-                iv = keyData.IV;
+                var dataAdd = users.First(us => us.Id == message.IdUser);
+                userKeysDictionary.Add(message.IdUser, (dataAdd));
+                user = dataAdd;
+                key = dataAdd.Key.Key;
+                iv = dataAdd.Key.IV;
             }
             var text = _encryptor.DecryptMessage(message.Text, key, iv);
-            yield return new MessageDto(message, text);
+            yield return new MessageDto(message, text, user);
         }
     }
 }

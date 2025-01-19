@@ -1,3 +1,4 @@
+using Application.Chat.Dto;
 using Application.Common.Result;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
@@ -12,7 +13,8 @@ public class CreateChatCommand : IRequest<Result<int>>
     public string Type { get; set; }
     public List<int> IdUsers { get; set; }
     
-    
+
+
 }
 
 internal class  CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Result<int>>

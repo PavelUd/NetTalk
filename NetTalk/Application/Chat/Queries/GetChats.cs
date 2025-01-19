@@ -5,6 +5,7 @@ using Application.Interfaces.Repositories;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Chat.Queries;
 
@@ -28,8 +29,21 @@ internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result
 
     public async Task<Result<List<ChatSummary>>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
     {
-        var result = _unitOfWork.ChatRepository.FindByCondition(c => c.Users.Any(us => us.Id == _user.Id))
-            .ProjectTo<ChatSummary>(_mapper.ConfigurationProvider).ToList();
-        return await Result<List<ChatSummary>>.SuccessAsync(result);
+        var result = _unitOfWork.ChatRepository.FindByCondition(c => c.Users.Any(us => us.Id == _user.Id)).Include(us => us.Users);
+        return await Result<List<ChatSummary>>.SuccessAsync(GetSummaries(result).ToList());
+    }
+
+    private IEnumerable<ChatSummary> GetSummaries (IEnumerable<Domain.Entities.Chat> chats)
+    {
+        foreach (var chat in chats)
+        {
+            var otherUser = chat.Users.First(us => us.Id != _user.Id);
+            yield return new ChatSummary()
+            {
+                Id = chat.Id,
+                Url = otherUser.AvatarUrl,
+                Name = otherUser.FullName
+            };
+        }
     }
 }

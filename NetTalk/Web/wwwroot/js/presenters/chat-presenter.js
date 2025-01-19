@@ -1,60 +1,126 @@
-import SelfMessageView from "../views/self-message-view.js";
-import OtherMessageView from "../views/other-message-view.js";
+import MessagePresenter from "./message-presenter.js";
+import {remove, render, RenderPosition} from "../framework/render.js";
+import ErrorView from "../views/error-view.js";
+import LoadingView from "../views/load-view.js";
+import {UpdateType} from "../utils/const.js";
+import ChatView from "../views/chat-view.js";
 
 export default class ChatPresenter{
-    #messageView
-    #model
-    
-   constructor(model, messageView) {
-        this.#messageView = messageView;
-        this.#model = model
+    #messagesModel
+    #container;
+    #user;
+    #inputButtonPresenter
+    #errorElement = new ErrorView();
+    #messagePresenters = new Map()
+    #loadingElement = new LoadingView();
+    #chatView =new ChatView();
+    #isLoading = true;
+    #isError = false;
+
+    constructor({container, messagesModel, inputButtonPresenter}) {
+        this.#user = JSON.parse(localStorage.getItem('user'));
+        this.#messagesModel = messagesModel;
+        this.#container = container
+        this.#messagesModel.addObserver(this.#modelEventHandler);
+        this.#inputButtonPresenter = inputButtonPresenter;
     }
 
-    logMessages(){
-        
+    get messages() {
+        return this.#messagesModel.getAll();
+    }
+
+    #renderChat = () =>{
+        if (this.#isError) {
+            this.#renderError();
+            return;
+        }
+        if (this.#isLoading) {
+            this.#renderLoader();
+            return;
+        }
+        this.#clearChat();
+        this.#renderMessageList();
+        this.#inputButtonPresenter.init(
+            {
+                onButtonClick: this.#handleNewPointClick
+            });
+        this.#chatView.scrollToBottom();
+    };
+    #clearChat = () =>{
+        this.#clearMessageList();
+        this.#inputButtonPresenter.destroy()
+    }
+
+    #renderEmptyChat = ()=>{
+        this.#clearChat();
+        this.#inputButtonPresenter.init(
+            {
+                onButtonClick: this.#initChatClick
+            });
     }
     
-    async init(id){
-        this.chat = await this.#model.getChat(id);
-        console.log(this.chat);
-        if (!this.chat.succeeded) {
-            console.log("error");
-        }
-        else{
-  //          window.history.pushState(null, null, '/chats/' + this.chat.data.id);
-        }
-            let messagesContainer = document.getElementById('messagesList');
-            messagesContainer.innerHTML = `
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    `;
-            const us = JSON.parse(localStorage.getItem('user'));
-            setTimeout(()=>{
-                let messagesContainer = document.getElementById('messagesList');
-                let input = document.getElementById('input');
-                messagesContainer.innerHTML = '';
-
-                messagesContainer.style.justifyContent = '';
-                messagesContainer.style.alignItems = '';
-                messagesContainer.style.display = '';
-                this.chat.data.messages.forEach(message => {
-                    if(message.idUser == us.Id) {
-                        let url = us.PhotoUrl;
-                        let element = new SelfMessageView(message, url);
-                        messagesContainer.innerHTML += element.template
-                    }
-                    else{
-                        let url = this.chat.data.users.find(u => u.id == message.idUser).avtarUrl
-                        let element = new OtherMessageView(message, url);
-                        messagesContainer.innerHTML += element.template
-                        
-                    }
-                })
-                input.hidden = false;
-            }, 500);
+    async destroy(){
+        this.#messagesModel.removeObserver(this.#modelEventHandler);
+        await this.#messagesModel.destroy();
+        this.#clearChat();
     }
+    
+   #renderMessageList= () =>{
+       this.messages.forEach((message) => this.#renderMessage(message));
+   };
+    #clearMessageList = () => {
+        this.#messagePresenters.forEach((presenter) => presenter.destroy());
+        this.#messagePresenters.clear();
+    };
+    
+    #modelEventHandler = (updateType, data) =>{
+        switch (updateType) {
+            case UpdateType.INIT:
+                if (data.error) {
+                    this.#isError = true;
+                } else {
+                    this.#isLoading = false;
+                    this.#isError = false;
+                    remove(this.#loadingElement);
+                }
+                this.#renderChat();
+                break;
+            case UpdateType.MAJOR:{
+                this.#clearChat();
+                this.#renderChat();
+                break;
+            }   
+            
+            case UpdateType.EMPTY:{
+                this.#renderEmptyChat();
+                break;
+                
+            }
+        }
+    }
+    
+    #initChatClick = async (data) =>{
+       await this.#messagesModel.createChat(data)
+    }
+    
+   #renderMessage = (message) =>{
+       const messagePresenter = new MessagePresenter({
+           container: this.#container
+       });
+       let type = this.#user.Id == message.user.idUser ? "self" : "other"
+       messagePresenter.init(message, type);
+       this.#messagePresenters.set(message.id,  messagePresenter);
+   }
+
+    #handleNewPointClick = (message) => {
+        this.#messagesModel.send(message);
+    }
+    #renderLoader = () => {
+        render(this.#loadingElement, this.#container, RenderPosition.AFTERBEGIN);
+    };
+
+    #renderError = () => {
+        render(this.#errorElement, this.#container, RenderPosition.AFTERBEGIN);
+    };
     
 }

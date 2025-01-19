@@ -33,4 +33,16 @@ public class IdentityUser : IUser
 
     public string Name => _httpContextAccessor.HttpContext?.User.Identity?.Name ?? string.Empty;
 
+    public string AvatarUrl
+    {
+        get
+        {
+            var value = _httpContextAccessor.HttpContext?.User.FindFirst("PhotoUrl")?.Value;
+            if (value != null)
+                return value;
+            return "";
+        }
+        init { }
+    }
+
 }

@@ -22,13 +22,15 @@ internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Res
     private readonly IMapper _mapper;
     private readonly IUser _user;
     private readonly IMessageEncryptor _encryptor;
+    private readonly IMediator _mediator;
 
-    public AddMessageCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IUser user, IMessageEncryptor encryptor)
+    public AddMessageCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IUser user, IMessageEncryptor encryptor, IMediator mediator)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _user = user;
         _encryptor = encryptor;
+        _mediator = mediator;
     }
 
     public async Task<Result<MessageDto>> Handle(AddMessageCommand request, CancellationToken cancellationToken)
@@ -41,6 +43,9 @@ internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Res
             {
                 return await Result<MessageDto>.FailureAsync(encryptedMessage.Errors);
             }
+            var chat = _unitOfWork.ChatRepository
+                .FindByCondition(us => us.Id == request.IdChat).Include(c => c.Messages)
+                .FirstOrDefault();
             var message = new Message()
             {
                 IdChat = request.IdChat,
@@ -49,10 +54,14 @@ internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Res
                 CreatedDate = DateTime.Now.ToUniversalTime(),
                 IdUser = _user.Id
             };
-            var chat = _unitOfWork.ChatRepository.FindByCondition(us => us.Id == request.IdChat).Include(c => c.Messages).First();
             chat.Messages.Add(message);
             _unitOfWork.Commit();
-            var dto = new MessageDto(message, request.Text);
+            var dto = new MessageDto(message, request.Text, new User
+            {
+                AvatarUrl = _user.AvatarUrl,
+                FullName = _user.Name,
+                Id = _user.Id
+            });
             return await Result<MessageDto>.SuccessAsync(dto);
         }
         catch (Exception e)
@@ -69,7 +78,6 @@ internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Res
         var encryptMessage = _encryptor.EncryptMessage(key, iv, message);
         return await Result<byte[]>.SuccessAsync(encryptMessage);
     }
-    
     
     
 }

@@ -23,7 +23,7 @@
                   @{
                     foreach (var message in Model.Chat.Messages.OrderBy(ms => ms.CreatedDate))
                     {
-                      if (message.IdUser == @id)
+                      if (message.User.IdUser == @id)
                       {
                         <div class="d-flex flex-row justify-content-end">
                           <div>
@@ -37,7 +37,7 @@
                       else
                       {
                         <div class="d-flex flex-row justify-content-start">
-                          <img src=" @Model.Chat.Users.First(us => us.Id == message.IdUser).AvatarUrl"
+                          <img src=" @Model.Chat.Name"
                                alt="avatar 1" style="width: 45px; height: 100%;">
                           <div>
                             <p class="small p-2 ms-3 mb-1 rounded-3" style="background: #bebebf">@message.Text</p>
@@ -50,7 +50,7 @@
 
                 </div>
               </div>
-              <div class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2" id="input">
+              <div class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2 " id="input">
                 <img src="@url"
                      alt="avatar 3" style="width: 40px; height: 100%;">
                 <input type="text" data-url="@url" data-id="@Model.Chat.Id" class="form-control form-control-lg" id="exampleFormControlInput2"

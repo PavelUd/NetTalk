@@ -14,17 +14,27 @@ export default class NavSearchView extends AbstractView{
     #button;
     #input;
     #onSearchClickHandler;
-    constructor({onSearchClickHandler}) {
+    #onInputClearHandler;
+    constructor({onSearchClickHandler,onInputClearHandler}) {
         super();
         this.#onSearchClickHandler = onSearchClickHandler;
+        this.#onInputClearHandler= onInputClearHandler;
         this.#button = this.element.querySelector('.js-btn');
         this.#input = this.element.querySelector('.js-input')
+        this.#input.addEventListener('input', this.#onChangeInput);
         this.#button.addEventListener('click', this.#onSearchClick);
     }
     get template() {
         return createTemple();
     }
 
+    #onChangeInput = (evt) =>{
+        let login = this.#input.value;
+        if(login == ''){
+            this.#onInputClearHandler();
+        }
+    }
+    
     #onSearchClick = (evt) =>{
         let login = this.#input.value;
         if(login == ''){

@@ -51,11 +51,13 @@ export default class ChatPresenter{
         this.#inputButtonPresenter.destroy()
     }
 
-    #renderEmptyChat = ()=>{
+    #renderEmptyChat = (idUser)=>{
         this.#clearChat();
         this.#inputButtonPresenter.init(
             {
-                onButtonClick: this.#initChatClick
+                onButtonClick: async (data) => { 
+                    await this.#messagesModel.createChat(data,[ idUser, parseInt(this.#user.Id) ]) 
+                }
             });
     }
     
@@ -87,20 +89,17 @@ export default class ChatPresenter{
                 break;
             case UpdateType.MAJOR:{
                 this.#clearChat();
+                this.#isLoading = false;
                 this.#renderChat();
                 break;
             }   
             
             case UpdateType.EMPTY:{
-                this.#renderEmptyChat();
+                this.#renderEmptyChat(data.idUser);
                 break;
                 
             }
         }
-    }
-    
-    #initChatClick = async (data) =>{
-       await this.#messagesModel.createChat(data)
     }
     
    #renderMessage = (message) =>{

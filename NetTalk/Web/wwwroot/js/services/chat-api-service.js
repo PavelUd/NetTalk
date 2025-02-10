@@ -38,16 +38,31 @@ export default class ChatAPIService extends ApiService
     }
     
    
-    receive(callback){
+    receive(callback) {
         this.#connection.off("ReceiveMessage");
         this.#connection.on("ReceiveMessage", (data) => {
             callback(data)
         });
     }
+
+    receiveInitChatFromOtherUser(callback){
+        this.#connection.off("ReceiveInitChat");
+        this.#connection.on("ReceiveInitChat", (data) => {
+            callback(data)
+        });
+    }
     
-    async create(data){
-        console.log(data)
- //       return ApiService.parseResponse(response);
+    receiveInitChat(callback){
+        this.#connection.off("InitChat");
+        this.#connection.on("InitChat", (data) => {
+            callback(data)
+        });
+    }
+    
+    async create(message, users){
+        
+        await this.#connection.invoke("InitPrivateChat", message,users)
+            .catch(err => console.error(err.toString()));
     }
     
     async search(login){
@@ -59,8 +74,7 @@ export default class ChatAPIService extends ApiService
     }
     
     async leaveChat(id){
-        console.log(id);
-        await this.#connection.invoke("LeavePrivateChat", id)
+        await this.#connection.invoke("LeavePrivateChat", id)  
             .catch(err => console.error(err.toString()));
     }
     async disconnect() {

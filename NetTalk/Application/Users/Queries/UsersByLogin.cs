@@ -32,7 +32,7 @@ internal class GetUsersByLoginQueryHandler : IRequestHandler<GetUsersByLoginQuer
     public async Task<Result<List<UserDto>>> Handle(GetUsersByLoginQuery request, CancellationToken cancellationToken)
     {
         var users = _unitOfWork.UserRepository
-                .FindByCondition(us => us.FullName.ToLower().StartsWith(request.Login.ToLower()))
+                .FindByCondition(us =>us.Id != _user.Id && us.FullName.ToLower().StartsWith(request.Login.ToLower()))
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider).ToList();
         foreach (var user in users)
         {

@@ -6,7 +6,7 @@ export function decodeJwtToken(token){
 }
 
 export function formatDate(isoDate) {
-    const date = new Date(isoDate);
+    const date = new Date(isoDate);  
 
     const time = date.toLocaleTimeString('ru-RU', {
         hour: '2-digit',

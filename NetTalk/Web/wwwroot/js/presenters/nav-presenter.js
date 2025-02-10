@@ -35,7 +35,7 @@ export default class NavPresenter{
     }
     
     #renderSearch(){
-        render(new NavSearchView({onSearchClickHandler: this.#onSearchClickHandler}), this.#container);
+        render(new NavSearchView({onSearchClickHandler: this.#onSearchClickHandler, onInputClearHandler: this.#onInputClearHandler}), this.#container);
     }
     #renderChatNav(summary) {
         this.destroy()
@@ -52,5 +52,9 @@ export default class NavPresenter{
 
     #onSearchClickHandler = (login) => {
         this.#chatsModel.search(login);
+    }
+
+    #onInputClearHandler = () =>{
+        this.#chatsModel.init();
     }
 }

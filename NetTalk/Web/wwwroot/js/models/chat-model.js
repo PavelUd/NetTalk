@@ -20,6 +20,7 @@ export default class ChatSummaryModel extends Observable
         try {
             let data = await this.#service.getUserChats();
             this.#chats = data.data;
+            this.#service.receiveInitChatFromOtherUser(this.init.bind(this));
             this._notify(UpdateType.INIT, {isError: false});
         }
         catch (error){

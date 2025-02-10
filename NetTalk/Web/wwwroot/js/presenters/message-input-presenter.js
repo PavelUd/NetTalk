@@ -3,7 +3,6 @@ import MessageInputView from "../views/message-input-view.js";
 
 export default class MessageInputPresenter
 {
-
     #container;
     #button;
     #onButtonClick;

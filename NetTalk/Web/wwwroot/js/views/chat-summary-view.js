@@ -1,9 +1,9 @@
 import AbstractView from "../framework/view/abstract-view.js";
 
 
-function createTemple(summary){
+function createTemple(summary, isActive){
 
-    return `<li class="p-2 border-bottom chatLink" data-id = "${summary.id}">
+    return `<li class="p-2 border-bottom chatLink ${isActive ? "active" : ""}" data-id = "${summary.id}">
                                  <span id="chatLink" href="/chats/${summary.id}" class="d-flex justify-content-between ">
                                    <div class="d-flex flex-row">
                                      <div>
@@ -25,17 +25,18 @@ export default class ChatSummaryView extends AbstractView{
     #chatSummary
     #onClickHandler
     #onClickEmptyChatHandler
-    
-    constructor({summary, onClickHandler, onClickEmptyChatHandler}) {
+    #isActive
+    constructor({summary, onClickHandler, onClickEmptyChatHandler, isActive = false}) {
         super();
         this.#chatSummary = summary;
+        this.#isActive = isActive
         this.#onClickEmptyChatHandler = onClickEmptyChatHandler
         this.#onClickHandler = onClickHandler
         this.element.addEventListener('click', this.#onClick);
     }
     
     get template() {
-        return createTemple(this.#chatSummary);
+        return createTemple(this.#chatSummary, this.#isActive);
     }
     
     #onClick = (evt) =>{
@@ -47,7 +48,6 @@ export default class ChatSummaryView extends AbstractView{
         evt.currentTarget.classList.add('active');
         let idChat = evt.currentTarget.dataset.id;
         if(idChat == -1){
-            console.log(this.#chatSummary)
             this.#onClickEmptyChatHandler(this.#chatSummary)
         }
         else {

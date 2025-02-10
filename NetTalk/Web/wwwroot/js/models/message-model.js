@@ -15,7 +15,8 @@ export default class MessageModel extends Observable
     async initEmptyChat({userId, url, name}){
         try{
             this.#info = {name: name, url: url }
-            this._notify(UpdateType.EMPTY, {isError : false});
+            this.#service.receiveInitChat(this.initId.bind(this));
+            this._notify(UpdateType.EMPTY, {isError : false, idUser: userId});
         }
         catch (error) {
             this.#messages = [];
@@ -31,7 +32,7 @@ export default class MessageModel extends Observable
          this.#info = {name: messages.data.name, url:messages.data.url }
          await this.#service.joinChat(this.#id);
          this.#service.receive(this.add.bind(this));
-         this._notify(UpdateType.INIT, {isError : false});
+         this._notify(UpdateType.INIT, {isError : false, idChat: id});
     }            
     catch (error) {
         this.#messages = [];
@@ -59,11 +60,9 @@ export default class MessageModel extends Observable
         this.#id = 0;
     }
     
-    async createChat(data){
-       let chat = await this.#service.create(data); 
-       let type = UpdateType.MAJOR;
-       this.#messages = [];
-       this._notify(type, {isError : false });
+    async createChat(data, users){
+       await this.#service.create(data, users);
+       this.#service.receive(this.add.bind(this));
     }
     
     add(message) {
@@ -73,4 +72,7 @@ export default class MessageModel extends Observable
         this._notify(type, {isError : false });
     }
     
+    async initId(id){
+       await this.init({id})
+    }
 }

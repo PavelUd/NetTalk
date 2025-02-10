@@ -1,6 +1,6 @@
 import LoadingView from "../views/load-view.js";
 import ErrorView from "../views/error-view.js";
-import {remove, render, RenderPosition} from "../framework/render.js";
+import {remove, render, RenderPosition, replace} from "../framework/render.js";
 import ChatSummaryPresenter from "./chat-summary-presenter.js";
 import {UpdateType} from "../utils/const.js";
 
@@ -20,6 +20,7 @@ export default class ChatsPresenter{
         this.#user = JSON.parse(localStorage.getItem('user'));
         this.#container = container;
         this.#chatModel = model;
+        this.messageModel.addObserver(this.#messageModelEventHandler);
         this.#chatModel.addObserver(this.#modelEventHandler);
     }
     get summaries() {
@@ -43,7 +44,7 @@ export default class ChatsPresenter{
         
     };
     #renderMessageList= () =>{
-        console.log(this.summaries)
+
         this.summaries.forEach((summary) => this.#renderSummary(summary));
     };
     #clearMessageList = () => {
@@ -68,13 +69,37 @@ export default class ChatsPresenter{
                 this.#renderChats();
                 break;
             case UpdateType.MAJOR:{
-                console.log("hello");
                 this.#renderChats();
                 break;
             }
         }
     }
+
+    #addUserChat = (idChat) =>{
+        this.#chatSummaryPresenters.forEach((presenter) =>
+        {
+            if(presenter.isActive) {
+                presenter.addUserChat(idChat)
+            }
+        })
+    }
     
+    #messageModelEventHandler = (updateType, data) => {
+        switch (updateType) {
+            case UpdateType.INIT:
+                this.#addUserChat(data.idChat)
+                break;
+            }
+        }
+    #disableChatSummary = () => {
+        this.#chatSummaryPresenters.forEach((presenter) =>
+        { 
+            if(presenter.isActive) {
+                presenter.isActive = false 
+            }
+        })
+        
+    }
     #renderLoader = () => {
         render(this.#loadingElement, this.#container, RenderPosition.AFTERBEGIN);
     };
@@ -85,6 +110,7 @@ export default class ChatsPresenter{
     
     onClickHandler = async  (idChat) => 
     {
+        this.#disableChatSummary();
         await this.messageModel.destroy();
         await this.messageModel.init({id: idChat});
     }

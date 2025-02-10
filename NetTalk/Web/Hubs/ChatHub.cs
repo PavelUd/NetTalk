@@ -32,7 +32,7 @@ public class ChatHub : Hub
     public async Task InitPrivateChat(string message, List<int> idUsers)
     {
         var userId = Context.User!.Claims.FirstOrDefault(cl => cl.Type == "Id")?.Value;
-        var otherUserId = idUsers.First(us => us.ToString() == userId);
+        var otherUserId = idUsers.First(us => us.ToString() != userId);
         var command = new CreateChatCommand()
         {
             IdUsers = idUsers,
@@ -42,7 +42,8 @@ public class ChatHub : Hub
         var result = await _mediator.Send(command);
         if (result.Succeeded)
         {
-            await Clients.Group(otherUserId.ToString()).SendAsync("InitChat",  JsonConvert.SerializeObject(result.Data));
+            await Clients.Group(userId).SendAsync("InitChat",  JsonConvert.SerializeObject(result.Data));
+            await Clients.Group(otherUserId.ToString()).SendAsync("ReceiveInitChat",  JsonConvert.SerializeObject(result.Data));
             await JoinPrivateChat(result.Data.ToString());
             await SendMessage(result.Data.ToString(), message);
         }
@@ -56,7 +57,7 @@ public class ChatHub : Hub
             Text = message
         };
        var result = await _mediator.Send(query);
-       await Clients.All.SendAsync("ReceiveMessage",  JsonConvert.SerializeObject(result.Data));
+       await Clients.Group($"Chat{idChat}").SendAsync("ReceiveMessage",  JsonConvert.SerializeObject(result.Data));
     }
     
     public override async Task OnConnectedAsync()

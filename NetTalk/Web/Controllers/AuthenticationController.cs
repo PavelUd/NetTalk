@@ -1,5 +1,5 @@
 using Application.Authentication.Command;
-using Application.Authentication.Queries;
+using Application.Queries.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NetTalk.Models;

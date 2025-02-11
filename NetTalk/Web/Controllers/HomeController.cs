@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using Application.Chat.Dto;
-using Application.Chat.Queries;
-using Application.Users.Queries;
+using Application.Queries.Chat;
+using Application.Queries.User;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NetTalk.Models;
-using GetChatsQuery = Application.Chat.Queries.GetChatsQuery;
+using GetChatsQuery = Application.Queries.Chat.GetChatsQuery;
 
 namespace NetTalk.Controllers;
 
@@ -28,21 +28,7 @@ public class HomeController : Controller
     [Route("chats/{id}")]
     public async Task<IActionResult> Chat(int id)
     {
-        var query = new GetChatByIdQuery()
-        {
-            Id = id
-        };
-        var result = await _mediator.Send(query);
-        if (!result.Succeeded)
-        {
-            return Redirect("/");
-        }
-        var chatViewModel = new ChatViewModel()
-        {
-            Chat = result.Data,
-            AllChats = await GetChatsList()
-        };
-        return View(chatViewModel);
+        return Ok();
     }
 
     public IActionResult Privacy()

@@ -1,4 +1,4 @@
-using Application.Extensions;
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Infrastructure.Extensions;
 using Infrastructure.Identity.Models;

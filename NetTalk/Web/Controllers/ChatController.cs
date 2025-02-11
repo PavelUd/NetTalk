@@ -1,6 +1,6 @@
 using Application.Chat.Commands;
-using Application.Chat.Queries;
-using Application.Users.Queries;
+using Application.Queries.Chat;
+using Application.Queries.User;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NetTalk.Models;

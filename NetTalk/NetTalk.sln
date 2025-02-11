@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 13.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{31C997C5-13B8-4B96-9365-9E0428DAB351}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{A382FD80-444F-464C-B7EB-3D8540A6AB25}"
@@ -9,6 +9,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{E72CED95-07FD-4C75-955B-01D3B2C381F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{F9E1AD9D-1B18-417F-9D8F-7C9A7F3BF5C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +38,9 @@ Global
 		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E71EC02-3FD6-4DF0-A8FE-87A2083218B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9E1AD9D-1B18-417F-9D8F-7C9A7F3BF5C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9E1AD9D-1B18-417F-9D8F-7C9A7F3BF5C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9E1AD9D-1B18-417F-9D8F-7C9A7F3BF5C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9E1AD9D-1B18-417F-9D8F-7C9A7F3BF5C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

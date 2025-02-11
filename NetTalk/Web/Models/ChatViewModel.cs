@@ -1,4 +1,5 @@
 using Application.Chat.Dto;
+using Application.Commands.Chat.Dto;
 
 namespace NetTalk.Models;
 

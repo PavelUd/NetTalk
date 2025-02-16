@@ -1,0 +1,73 @@
+.messageContainer {
+	display: flex;
+	flex-direction: row;
+}
+
+.avatarContainer {
+	display: flex;
+	align-items: center;
+}
+
+.otherMessageInfo {
+	height: 45px;
+	display: flex;
+
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-right: 20px;
+	margin-bottom: 5px;
+
+	.time {
+		@apply text-xs opacity-50;
+		font-weight: 200;
+	}
+
+	.username {
+		font-size: 0.875rem;
+		font-weight: 300;
+	}
+}
+
+.selfMessageInfo {
+	height: 45px;
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	gap: 5px;
+
+	.time {
+		@apply text-xs opacity-50;
+		font-weight: 200;
+	}
+
+	.username {
+		font-size: 0.875rem;
+		font-weight: 300;
+	}
+}
+
+.messageTextContainer {
+	max-width: 500px;
+	padding: 0.5rem 1.75rem;
+	border-radius: 0px 20px 20px 20px;
+	font-weight: 200;
+	background: var(--chatListBackground);
+}
+
+.selfMessageTextContainer {
+	border-radius: 20px 0px 20px 20px;
+	background: linear-gradient(135deg, #118ca6, #46a3e8);
+	color: #ffffff;
+}
+
+/* Для самих сообщений */
+.selfMessageContainer {
+	justify-content: flex-end;
+}
+
+.messageContent {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 5px;
+}

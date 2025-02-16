@@ -1,0 +1,68 @@
+.chatContainer {
+	position: relative;
+	height: 90vh;
+
+	nav {
+		@apply flex items-center justify-between;
+		backdrop-filter: var(--blur-effect);
+		background-color: var(--nav-bg);
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 10;
+
+		.navLeft {
+			@apply m-2 flex items-center justify-between p-2;
+
+			img {
+				width: 45px;
+				height: 45px;
+				border-radius: 50%;
+			}
+
+			.teamInfo {
+				@apply ml-4;
+
+				p {
+					font-weight: bold;
+				}
+
+				.gradientText {
+					font-size: 13px;
+					background: var(--gradient-text);
+					-webkit-background-clip: text;
+					color: transparent;
+
+					div {
+						display: inline-block;
+					}
+
+					.ml-1 {
+						margin-left: 0.25rem;
+					}
+				}
+			}
+		}
+
+		.navRight {
+			@apply mr-4 flex items-center justify-between;
+
+			color: var(--icon-color);
+
+			.iconWrapper {
+				@apply border-l-2 pl-4;
+				border-color: var(--border-color);
+			}
+		}
+	}
+
+	.messageList {
+		@apply w-full overflow-auto p-4 pt-20 pb-20;
+		height: 100vh;
+
+		.scrollContainer {
+			@apply p-4;
+			height: 100vh;
+		}
+	}
+}

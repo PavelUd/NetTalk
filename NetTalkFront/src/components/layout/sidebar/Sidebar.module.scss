@@ -1,0 +1,24 @@
+.sidebar {
+	@apply flex items-center flex-col justify-between border-r border-border py-layout;
+	background-color: var(--sliderBackground);
+	padding: 20px 15px 20px 15px;
+
+	a {
+		@apply mb-8 block;
+
+		&.active > svg {
+			@apply text-blue-400;
+		}
+	}
+
+	svg {
+		@apply text-[#7C7275] duration-300 ease-in-out transition-colors;
+		opacity: 0.5;
+
+		&:hover {
+			@apply text-blue-400;
+			opacity: 1;
+			transform: scale(1.1);
+		}
+	}
+}

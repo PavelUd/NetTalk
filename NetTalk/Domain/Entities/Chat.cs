@@ -32,7 +32,7 @@ public class Chat : BaseAuditableEntity
     [Column("chat_type")]
     public string Type { get; set; }
     
-    [Column("is_active")]
+    [Column("is_active")] 
     public bool IsActive { get; set; }
     
     [Column("created_by")]

@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #111317;
+		--foreground: #ededed;
+		--sliderBackground: #18181c;
+		--chatListBackground: #1c1c25;
+		--nav-bg: rgba(28, 28, 37, 0);
+		--blur-effect: blur(6px);
+		--gradient-text: linear-gradient(to right, #00c6ff, #0072ff);
+		--border-color: #2a2830;
+		--icon-color: #474646;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--background: #ededed;
+		--foreground: #111317;
+		--sliderBackground: #f5f5f5;
+		--chatListBackground: #ffffff;
+		--nav-bg: rgba(28, 28, 37, 0);
+		--blur-effect: blur(6px);
+		--gradient-text: linear-gradient(to right, #00c6ff, #0072ff);
+		--border-color: #2a2830;
+		--icon-color: #474646;
+	}
+}
+
+html,
+body {
+	font-family: 'Poppins', sans-serif;
+	overflow: hidden;
+	color: var(--foreground);
+	background: var(--background);
+	height: 100%;
+	position: relative;
+}
+
+h1 {
+	@apply text-4xl font-bold;
+}
+
+::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}

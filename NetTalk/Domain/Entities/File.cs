@@ -20,9 +20,9 @@ public class File : BaseEntity
     public string FileUrl { get; set; }
     
     [Column("id_message")]
-    public int IdMessage { get; set; }
+    public Guid  IdMessage { get; set; }
     
     [Column("id_user")]
-    public int IdUser { get; set; }
+    public Guid  IdUser { get; set; }
     
 }

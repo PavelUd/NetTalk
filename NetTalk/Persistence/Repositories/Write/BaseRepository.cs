@@ -23,6 +23,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
         return entity;
     }
 
+    public void Attach(T entity)
+    {
+        Context.Set<T>().Attach(entity);
+    }
+    
     public Task UpdateAsync(T entity)
     {
         var exist = Context.Set<T>().Find(entity.Id);

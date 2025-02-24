@@ -9,13 +9,12 @@ namespace Application.Queries.QueryModels;
 
 public class ChatQueryModel : IQueryModel
 {
-    public ChatQueryModel(string name, string url, int id, bool isActive, List<string> messages, List<string> users, int owner)
+    public ChatQueryModel(string name, string url, Guid  id, bool isActive, List<string> users, Guid  owner)
     {
         Name = name;
         Url = url;
         Id = id;
         IsActive = isActive;
-
         Owner = owner;
     }
 
@@ -25,23 +24,26 @@ public class ChatQueryModel : IQueryModel
     }
     public string Name { get; set; }
     public string Url{ get;set; }
-    public bool IsActive { get; set;}
-    public int Owner { get; set; }
-    public int Id { get; set; }
-    public List<string> Messages { get; set; }
+    public bool IsActive { get; init;}
+    public Guid Owner { get; init; }
+    public Guid Id { get; init; }
     
-    public List<string> Users { get; set; }
+    public string Type { get; init; }
+
+    public List<Guid> Participants { get; init; }
+    
     [BsonId]
-    public ObjectId ObjectId { get; set; }
+    [BsonIgnoreIfDefault]
+    public ObjectId ObjectId { get; init; }
     
     private class Mapping : Profile
     {
         public Mapping()
         {
             CreateMap<Domain.Entities.Chat, ChatQueryModel>()
-                .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages.Select(us => us.Id)))
-                .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(us => us.Id)));
+                .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.Users.Select(us => us.Id)));
             CreateMap<ChatCreatedEvent, ChatQueryModel>();
+            CreateMap<ChatQueryModel, ChatDto>();
         }
     }
     

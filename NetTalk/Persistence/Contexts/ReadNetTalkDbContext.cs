@@ -49,6 +49,7 @@ public sealed class ReadNetTalkDbContext: IReadDbContext, ISynchronizeDb
     public IMongoCollection<TQueryModel> GetCollection<TQueryModel>() where TQueryModel : class =>
         _mongoDatabase.GetCollection<TQueryModel>(typeof(TQueryModel).Name);
     
+    
     #endregion
     
     #region ISynchronizeDb

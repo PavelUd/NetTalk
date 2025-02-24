@@ -1,5 +1,5 @@
 class FetchClient {
-	private API_URL = process.env.API_URL as string
+	private API_URL = 'http://127.0.0.1:5209/' as string
 	constructor(private defaultHeaders: Record<string, string> = {}) {}
 
 	async get<T>(
@@ -53,7 +53,6 @@ class FetchClient {
 		headers?: Record<string, string>
 	): Promise<T> {
 		const url = `${this.API_URL}${path}`
-
 		const authorizationHeader: HeadersInit = isAuth
 			? { Authorization: `Bearer ${localStorage.getItem('token')}` }
 			: {}
@@ -78,7 +77,7 @@ class FetchClient {
 
 			return data
 		} catch (error) {
-			throw error
+			throw new Error(error)
 		}
 	}
 }

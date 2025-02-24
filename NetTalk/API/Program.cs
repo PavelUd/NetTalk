@@ -25,11 +25,18 @@ builder.Host.UseNLog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost3000",
+        builder => builder.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.AddApplicationLayer();
+
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     var settings = options.SerializerSettings;
@@ -53,8 +60,8 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Office-Seats API",
-        Description = "API"
+        Title = "NetTalk API",
+        Description = "API для обмена сообщениями между пользователями."
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -89,7 +96,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-
+app.UseCors("AllowLocalhost3000");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.MapControllers();

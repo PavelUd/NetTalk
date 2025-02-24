@@ -5,6 +5,7 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using Persistence.Contexts;
 
 namespace Persistence.Repositories;
@@ -16,11 +17,13 @@ public class UnitOfWork : IUnitOfWork
     private readonly ILogger<UnitOfWork> _logger;
     private ChatRepository? _chatRepository;
     private UserRepository? _userRepository;
+    private readonly IEventStoreRepository _eventStoreRepository;
 
-    public UnitOfWork(NetTalkDbContext context, IMediator mediator, ILogger<UnitOfWork> logger)
+    public UnitOfWork(NetTalkDbContext context, IMediator mediator,IEventStoreRepository eventStoreRepository, ILogger<UnitOfWork> logger)
     {
         _context = context;
         _mediator = mediator;
+        _eventStoreRepository = eventStoreRepository;
         _logger = logger;
     }
 
@@ -45,12 +48,12 @@ public class UnitOfWork : IUnitOfWork
             _logger.LogInformation("----- Begin transaction: '{TransactionId}'", transaction.TransactionId);
             try
             {
-                var domainEvents = BeforeSaveChanges();
+                var (domainEvents, eventStores) = BeforeSaveChanges();
                 var rowsAffected = await _context.SaveChangesAsync();
 
                 _logger.LogInformation("----- Commit transaction: '{TransactionId}'", transaction.TransactionId);
                 
-                await AfterSaveChangesAsync(domainEvents);
+                await AfterSaveChangesAsync(domainEvents, eventStores);
                 await transaction.CommitAsync();
 
                 _logger.LogInformation(
@@ -72,6 +75,7 @@ public class UnitOfWork : IUnitOfWork
             }
         });
     }
+    
     public void Commit()
     {
         var result = _context.SaveChanges();
@@ -83,7 +87,7 @@ public class UnitOfWork : IUnitOfWork
     }
 
 
-    private IReadOnlyList<BaseEvent> BeforeSaveChanges()
+    private (IReadOnlyList<BaseEvent> domainEvents, IReadOnlyList<EventStore> eventStores) BeforeSaveChanges()
     {
         var entities = _context.ChangeTracker.Entries<BaseEntity>()
             .Where(entry => entry.Entity.DomainEvents.Any())
@@ -91,17 +95,21 @@ public class UnitOfWork : IUnitOfWork
         
         var domainEvents = entities.SelectMany(x => x.Entity.DomainEvents)
             .ToList();
+        var eventStores = domainEvents
+            .ConvertAll(@event => new EventStore(@event.AggregateId, @event.GetType().ToString(), @event.ToJson()));
         
         entities.ForEach(entry => entry.Entity.ClearDomainEvents());
-        return domainEvents;
+        return (domainEvents, eventStores) ;
         
     }
     
     private async Task AfterSaveChangesAsync(
-        IReadOnlyList<BaseEvent> domainEvents)
+        IReadOnlyList<BaseEvent> domainEvents, IReadOnlyList<EventStore> eventStores)
     {
         if (!domainEvents.Any())
             return;
+        if (eventStores.Count > 0)
+            await _eventStoreRepository.StoreAsync(eventStores);
         
         await Task.WhenAll(domainEvents.Select(@event => _mediator.Publish(@event)));
     }

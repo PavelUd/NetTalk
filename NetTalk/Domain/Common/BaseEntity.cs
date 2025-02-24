@@ -6,7 +6,7 @@ namespace Domain.Common;
 public class BaseEntity: IEntity
 {
     [Column("id")]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     private readonly List<BaseEvent> _domainEvents = [];
     

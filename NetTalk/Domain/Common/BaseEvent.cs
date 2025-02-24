@@ -6,13 +6,13 @@ public class BaseEvent : INotification
     /// <summary>
     /// Gets the type of the message.
     /// </summary>
-     public int Id { get; set; }
+     public Guid Id { get; set; } = Guid.NewGuid();
     public string MessageType { get; protected init; }
 
     /// <summary>
     /// Gets the aggregate ID.
     /// </summary>
-    public int AggregateId { get; protected init; }
+    public Guid AggregateId { get; protected init; }
 
     /// <summary>
     /// Gets the date and time when the event occurred.

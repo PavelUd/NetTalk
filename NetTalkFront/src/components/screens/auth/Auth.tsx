@@ -23,25 +23,18 @@ export function Auth({ type }: IAuth) {
 
 	const onSubmit: SubmitHandler<IAuthFormState> = async data => {
 		setIsLoading(true)
-		const response = await signIn(
-			'credentials',
-			type === 'Login'
-				? {
-						redirect: false,
-						email: 'gggggg',
-						password: 'dddddddddd',
-				  }
-				: {
-						redirect: false,
-						username: 'Gay',
-						...data,
-				  }
-		)
+		const response = await signIn('credentials', {
+			redirect: false,
+			login: data.email,
+			password: data.password,
+		})
 
 		if (response?.error) {
 			toast.error(response.error)
 			setIsLoading(false)
 			return
+		} else {
+			console.log(response)
 		}
 
 		setIsLoading(false)
@@ -120,7 +113,7 @@ export function Auth({ type }: IAuth) {
 					{...register('password', {
 						required: true,
 						minLength: {
-							value: 6,
+							value: 1,
 							message: 'Min length 6 symbols!',
 						},
 					})}

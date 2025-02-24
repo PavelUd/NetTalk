@@ -11,7 +11,7 @@ namespace Application.Chat.Commands;
 
 public record AddMessageCommand : IRequest<Result<MessageDto>>
 {
-    public int IdChat { get; set; }
+    public Guid  IdChat { get; set; }
     public string Text { get; set; }
 }
 

@@ -2,22 +2,21 @@ using Application.Chat.Dto;
 using Application.Common.Result;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
+using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Chat.Commands;
 
-public class CreateChatCommand : IRequest<Result<int>>
+public class CreateChatCommand : IRequest<Result<Guid>>
 {
     public string Name { get; set; }
     public string Type { get; set; }
-    public List<int> IdUsers { get; set; }
+    public List<User> Users { get; set; }
     
-
-
 }
 
-internal class  CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Result<int>>
+internal class  CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Result<Guid >>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUser _user;
@@ -28,21 +27,22 @@ internal class  CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Re
         _user = user;
     }
 
-    public async Task<Result<int>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid >> Handle(CreateChatCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var users = await _unitOfWork.UserRepository
-                .FindByCondition(u => request.IdUsers.Contains(u.Id))
-                .ToListAsync(cancellationToken: cancellationToken);
-            var chat = new Domain.Entities.Chat(request.Name, request.Type,true, 1, users);
+            foreach (var user in request.Users)
+            {
+                _unitOfWork.UserRepository.Attach(user);
+            }
+            var chat = new Domain.Entities.Chat(request.Name, request.Type,true, Guid.Empty, request.Users);
             await _unitOfWork.ChatRepository.AddAsync(chat);
             await _unitOfWork.SaveChangesAsync();
-             return await Result<int>.SuccessAsync(chat.Id);
+             return await Result<Guid>.SuccessAsync(chat.Id);
         }
         catch (Exception e)
         {
-            return await Result<int>.FailureAsync($"Ошибка при созданни чата: {e.Message}");
+            return await Result<Guid >.FailureAsync($"Ошибка при созданни чата: {e.Message}");
         }
     }
     

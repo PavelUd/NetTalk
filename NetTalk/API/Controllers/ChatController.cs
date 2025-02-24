@@ -1,7 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using Application.Chat.Commands;
+using Application.Common.Interfaces;
 using Application.Queries.Chat;
-using Application.Queries.User;
+using Application.Stories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +13,12 @@ namespace API.Controllers;
 public class ChatController : Controller
 {
     private readonly IMediator _mediator;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    
-    public ChatController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+    private readonly IStoryResolver _resolver;
+
+    public ChatController(IMediator mediator, IStoryResolver resolver)
     {
         _mediator = mediator;
-        _httpContextAccessor = httpContextAccessor;
+        _resolver = resolver;
     }
 
     /// <summary>
@@ -27,13 +27,9 @@ public class ChatController : Controller
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetChatById(int id)
+    public async Task<IActionResult> GetChatById(Guid  id)
     {
-        var query = new GetChatByIdQuery
-        {
-            Id = id
-        };
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(new GetChatByIdQuery { Id = id });
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
     /// <summary>
@@ -43,9 +39,12 @@ public class ChatController : Controller
     [HttpGet]
     public async Task<IActionResult> GetChats()
     {
-        var query = new GetChatsQuery();
-        var result = await _mediator.Send(query);
-        return result.Succeeded ? Ok(result) : BadRequest(result);
+        var result = await _mediator.Send(new GetChatsQuery());
+        if (!result.Succeeded)
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
     }
     
     
@@ -55,9 +54,10 @@ public class ChatController : Controller
     /// <param name="command"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> CreateChat([FromBody] CreateChatCommand command)
+    public async Task<IActionResult> CreateChat([FromBody] List<Guid> idUsers)
     {
-        var result = await _mediator.Send(command);
+        var createChatStory = _resolver.Resolve<CreateChatStory>();
+        var result = await createChatStory.Handle("group", idUsers, "chat");
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }

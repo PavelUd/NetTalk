@@ -1,11 +1,13 @@
 using System.Reflection;
 using Application.Behaviors;
+using Application.Chat.Dto;
 using Application.Common.Interfaces;
-using Application.EventHandlers;
+using Application.Queries.Chat;
+using Application.Stories;
 using Domain.Events.Chat;
+using Domain.Events.User;
 using FluentValidation;
 using MediatR;
-using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Common.Extensions;
@@ -17,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddAutoMapper();
         services.AddMediator();
+        services.AddStories();
     }
 
     private static void AddAutoMapper(this IServiceCollection services)
@@ -32,10 +35,17 @@ public static class ServiceCollectionExtensions
             cfg.RegisterServicesFromAssembly(assembly);
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(ChatCreatedEvent)));
+            cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(UserCreatedEvent)));
 //            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
         });
         
+    }
+
+    private static void AddStories(this IServiceCollection services)
+    {
+        services.AddScoped<CreateChatStory>();
+        services.AddScoped<IStoryResolver, StoryResolver>();
     }
 
 }

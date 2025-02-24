@@ -1,6 +1,8 @@
+import { $fetch } from '@/api/api.fetch'
+import { JwtPayload } from '@/models/jwtPayload'
+import { jwtDecode } from 'jwt-decode'
 import { User } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-
 export const nextAuthOptions = {
 	debug: !!process.env.AUTH_DEBUG,
 	providers: [
@@ -16,13 +18,14 @@ export const nextAuthOptions = {
 			},
 			async authorize(credentials) {
 				console.log('Received credentials:', credentials)
-
+				const response = await $fetch.post('api/auth/login', credentials)
+				const user = jwtDecode<JwtPayload>(JSON.stringify(response))
 				return {
-					id: '123',
-					email: 'paveludin4@gmail.com',
-					username: 'loch',
-					avatar: 'avatar_url',
-					jwt: 'jwt_token',
+					id: user.Id,
+					email: user.unique_name,
+					username: user.FullName,
+					avatar: user.PhotoUrl,
+					jwt: response,
 				} as User
 			},
 		}),
@@ -32,6 +35,7 @@ export const nextAuthOptions = {
 	},
 	callbacks: {
 		jwt({ token, user, account }) {
+			console.log(token, user, account)
 			return { ...token, ...user }
 		},
 		session({ session, token, user }) {

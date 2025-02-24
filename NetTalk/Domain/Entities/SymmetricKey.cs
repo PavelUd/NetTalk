@@ -7,7 +7,7 @@ namespace Domain.Entities;
 public class SymmetricKey : BaseEntity
 {
     [Column("id_user")] 
-    public int IdUser { get; set; }
+    public Guid  IdUser { get; set; }
 
     [Column("iv")]
     public byte[] IV{  get; set; }

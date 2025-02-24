@@ -49,7 +49,12 @@ public static class ServiceCollectionExtensions
         services
             .AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork))
             .AddTransient<IChatRepository, ChatRepository>()
-            .AddScoped<IChatReadOnlyRepository, ChatReadOnlyRepository>();
+            .AddTransient<IEventStoreRepository, EventStoreRepository>()
+            .AddScoped<IChatReadOnlyRepository, ChatReadOnlyRepository>()
+            .AddScoped<IMessageReadOnlyRepository, MessageReadOnlyRepository>()
+            .AddScoped<IUserReadOnlyRepository, UserReadOnlyRepository>();
+        
+
     }
     
     private static void ConfigureMongoDb()
@@ -68,6 +73,7 @@ public static class ServiceCollectionExtensions
                 }, _ => true);
             
             new ChatMap().Configure();
+            new UserMap().Configure();
         }
         catch
         {

@@ -1,5 +1,12 @@
+'use client'
+
+import { $fetch } from '@/api/api.fetch'
 import Field from '@/components/ui/field/Field'
+import { useAuth } from '@/hooks/useAuth'
 import { chatSummaries } from '@/mocks/chatSummary'
+import { IChatSummary } from '@/models/chatSummary'
+import { useQuery } from '@tanstack/react-query'
+import { Loader } from 'lucide-react'
 import { PiHashFill } from 'react-icons/pi'
 import { SlMagnifier } from 'react-icons/sl'
 import { TbEditCircle } from 'react-icons/tb'
@@ -7,6 +14,15 @@ import styles from './ChatList.module.scss'
 import { ChatListItem } from './ChatListItem'
 
 export function ChatsList() {
+	const { user, isLoggedIn } = useAuth()
+
+	const { data, isLoading, isFetching } = useQuery({
+		queryKey: ['chats'],
+		queryFn: () => $fetch.get('api/chats'),
+		enabled: isLoggedIn,
+	})
+
+	console.log(data, isLoading, isFetching)
 	return (
 		<div className={styles.container}>
 			<div className={styles.headerContainer}>
@@ -45,12 +61,22 @@ export function ChatsList() {
 					))}
 				</div>
 				<div className={styles.allMessagesLabel}>All MESSAGES</div>
-				{chatSummaries.map(chatSummary => (
-					<ChatListItem
-						key={`${chatSummary.name}-12233332`}
-						chatSummary={chatSummary}
-					/>
-				))}
+				<div>
+					{isLoading || isFetching ? (
+						<div className='p-layout'>
+							<Loader />
+						</div>
+					) : (
+						<div>
+							{data?.data.map((chatSummary: IChatSummary) => (
+								<ChatListItem
+									key={`${chatSummary.id}`}
+									chatSummary={chatSummary}
+								/>
+							))}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	)

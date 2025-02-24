@@ -34,10 +34,9 @@ internal class GetUsersByLoginQueryHandler : IRequestHandler<GetUsersByLoginQuer
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider).ToList();
         foreach (var user in users)
         {
-            var ids = new int[] { user.Id, _user.Id };
+            var ids = new Guid [] { user.Id, _user.Id };
             var chat = _unitOfWork.ChatRepository
                 .FindByCondition(c => ids.All(id => c.Users.Any(us => us.Id == id))).FirstOrDefault();
-           user.IdChat = chat?.Id ?? -1;
         }
         return await Result<List<UserDto>>.SuccessAsync( users);
     }

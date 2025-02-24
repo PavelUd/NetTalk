@@ -1,4 +1,4 @@
 namespace Domain.Events.Message;
 
-public class MessageUpdatedEvent(int id, int aggregateId, int idChat, byte[] text, int idUser)
-    : MessageBaseEvent(id, aggregateId, idChat, text, idUser);
+public class MessageUpdatedEvent(Guid  aggregateId, Guid  idChat, byte[] text, Guid idUser)
+    : MessageBaseEvent(aggregateId, idChat, text, idUser);

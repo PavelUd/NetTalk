@@ -12,7 +12,9 @@ export default function AuthProvider({ children }: PropsWithChildren<unknown>) {
 
 	useEffect(() => {
 		// Сохраняем JWT токен в localStorage при изменении user
-		window.localStorage.setItem('token', user?.jwt || '')
+		if (user) {
+			window.localStorage.setItem('token', user.jwt || '')
+		}
 	}, [user, isLoggedIn])
 
 	useEffect(() => {

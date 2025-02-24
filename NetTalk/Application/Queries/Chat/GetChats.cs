@@ -3,35 +3,56 @@ using Application.Common.Interfaces.Repositories.Query;
 using Application.Common.Result;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
+using Application.Queries.QueryModels;
+using Application.Queries.User;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.Linq;
 
 namespace Application.Queries.Chat;
 
-public record GetChatsQuery : IRequest<Result<List<ChatSummary>>>
+public record GetChatsQuery : IRequest<Result<List<ChatQueryModel>>>
 {
 }
 
 
-internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result<List<ChatSummary>>>
+internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result<List<ChatQueryModel>>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IUser _user;
-    private readonly IChatReadOnlyRepository _readOnlyRepository;
+    private readonly IChatReadOnlyRepository _chatRepository;
+    private readonly IUserReadOnlyRepository _userRepository;
 
-    public GetChatsQueryQueryHandler (IMapper mapper, IUser user, IChatReadOnlyRepository readOnlyRepository)
+    public GetChatsQueryQueryHandler(IUser user, IChatReadOnlyRepository readOnlyRepository, IUserReadOnlyRepository userReadOnlyRepository, IUnitOfWork unitOfWork)
     {
-        _mapper = mapper;
         _user = user;
-        _readOnlyRepository = readOnlyRepository;
+        _userRepository = userReadOnlyRepository;
+        _unitOfWork = unitOfWork;
+        _chatRepository = readOnlyRepository;
     }
 
-    public async Task<Result<List<ChatSummary>>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<ChatQueryModel>>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
     {
-        var ch = await  _readOnlyRepository.GetAllAsync();
-        return await Result<List<ChatSummary>>.SuccessAsync(_mapper.Map<List<ChatSummary>>(ch));
+        try
+        {
+            var chats = await _chatRepository.GetAllAsync();
+            var chatList = chats.ToList();
+            foreach (var chat in chatList)
+            {
+                if (chat.Type != "direct")
+                    continue;
+
+                var otherUserId = chat.Participants.First(id => id != _user.Id);
+                var otherUser = await _userRepository.GetByIdAsync(otherUserId);
+                chat.Name = otherUser.Username;
+                chat.Url = otherUser.Avatar;
+            }
+            return await Result<List<ChatQueryModel>>.SuccessAsync(chatList);
+        }
+        catch (Exception e)
+        {
+           return await Result<List<ChatQueryModel>>.FailureAsync(e.Message);
+        }
     }
-    
 }

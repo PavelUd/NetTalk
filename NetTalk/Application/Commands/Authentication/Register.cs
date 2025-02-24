@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Common.Result;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
@@ -8,9 +9,10 @@ namespace Application.Authentication.Command;
 
 public record RegisterCommand : IRequest<Result<string>>
 {
-    public string Login { get; set; }
+    [EmailAddress]
+    public string Email { get; set; }
     public string Password { get; set; }
-    public string FullName { get; set; }
+    public string Login { get; set; }
 }
 
 
@@ -39,24 +41,17 @@ internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordE
 
             var (passwordHash, salt) = encryptionService.PasswordEncryption(request.Password);
             var (key, iv) = keyEncryptor.GenerateKey();
-            var user = new User
+            var userKey = new SymmetricKey()
             {
-                Login = request.Login,
-                Password = passwordHash,
-                Salt = salt,
-                FullName = request.FullName,
-                AvatarUrl = _avatars[random.Next(_avatars.Count)],
-                LastOnline = DateTime.Now.ToUniversalTime(),
-                Key = new SymmetricKey()
-                {
-                    IV = iv,
-                    Key = key
-                }
+                IV = iv,
+                Key = key
             };
+            var user = new User(request.Email, passwordHash, request.Login, salt,
+                _avatars[random.Next(_avatars.Count)], userKey);
             
             await unitOfWork.UserRepository.AddAsync(user);
-            unitOfWork.Commit();
-            return await service.Authenticate(request.Login, request.Password);
+            await unitOfWork.SaveChangesAsync();
+            return await service.Authenticate(request.Email, request.Password);
         }
         catch (Exception e)
         {

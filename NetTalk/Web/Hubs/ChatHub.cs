@@ -29,7 +29,7 @@ public class ChatHub : Hub
         }
     }
 
-    public async Task InitPrivateChat(string message, List<int> idUsers)
+    public async Task InitPrivateChat(string message, List<long> idUsers)
     {
         var userId = Context.User!.Claims.FirstOrDefault(cl => cl.Type == "Id")?.Value;
         var otherUserId = idUsers.First(us => us.ToString() != userId);

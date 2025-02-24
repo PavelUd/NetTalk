@@ -1,6 +1,5 @@
 using Application.Queries.QueryModels;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 
 namespace Persistence.Mappings;
 
@@ -13,16 +12,16 @@ public class ChatMap
             classMap.AutoMap();
             classMap.SetIgnoreExtraElements(true);
 
-            classMap.MapMember(customer => customer.Id)
+            classMap.MapMember(chat => chat.Id)
                 .SetIsRequired(true);
 
-            classMap.MapMember(customer => customer.Url)
+            classMap.MapMember(chat => chat.Url)
+                .SetIsRequired(false);
+
+            classMap.MapMember(chat => chat.Owner)
                 .SetIsRequired(true);
 
-            classMap.MapMember(customer => customer.Owner)
-                .SetIsRequired(true);
-
-            classMap.MapMember(customer => customer.IsActive)
+            classMap.MapMember(chat => chat.IsActive)
                 .SetIsRequired(true);
         });
     }

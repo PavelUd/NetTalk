@@ -5,11 +5,6 @@ using MongoDB.Driver;
 
 namespace Persistence.Repositories.Read;
 
-internal class ChatReadOnlyRepository(IReadDbContext readDbContext) : BaseReadOnlyRepository<ChatQueryModel, int>(readDbContext), IChatReadOnlyRepository
+internal class ChatReadOnlyRepository(IReadDbContext readDbContext) : BaseReadOnlyRepository<ChatQueryModel, Guid>(readDbContext), IChatReadOnlyRepository
 {
-    public async Task<IEnumerable<ChatQueryModel>> GetAllAsync()
-    {
-        using var asyncCursor = await Collection.FindAsync<ChatQueryModel>(Builders<ChatQueryModel>.Filter.Empty);
-        return await asyncCursor.ToListAsync();
-    }
 }

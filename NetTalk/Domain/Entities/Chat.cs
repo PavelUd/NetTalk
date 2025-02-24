@@ -13,7 +13,7 @@ public class Chat : BaseAuditableEntity
 
     }
 
-    public Chat(string name, string type, bool isActive, int owner, List<User> users)
+    public Chat(string name, string type, bool isActive, Guid owner, List<User> users)
     {
         Name = name;
         Type = type;
@@ -22,8 +22,8 @@ public class Chat : BaseAuditableEntity
         Users = users;
         UpdatedDate = DateTime.Now.ToUniversalTime();
         CreatedDate = DateTime.Now.ToUniversalTime();
-        
-        AddDomainEvent(new ChatCreatedEvent(name, type, isActive, owner));
+
+        AddDomainEvent(new ChatCreatedEvent(name, type, isActive, users.Select(user => user.Id).ToList(), owner));
     }
     
     [Column("chat_name")]
@@ -36,7 +36,7 @@ public class Chat : BaseAuditableEntity
     public bool IsActive { get; set; }
     
     [Column("created_by")]
-    public int Owner { get; set; }
+    public Guid  Owner { get; set; }
     
     public List<Message> Messages { get; set; }
     public List<User> Users { get; set; }

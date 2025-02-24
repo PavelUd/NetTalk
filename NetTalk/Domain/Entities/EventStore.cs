@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Common;
 
 namespace Domain.Entities;
 
+[Table("events")]
 public class EventStore : BaseEvent
 {
-    public EventStore(int aggregateId, string messageType, string data)
+    public EventStore(Guid  aggregateId, string messageType, string data)
     {
         AggregateId = aggregateId;
         MessageType = messageType;
@@ -14,8 +16,6 @@ public class EventStore : BaseEvent
     public EventStore()
     {
     }
-    
-    public Guid Id { get; private init; } = Guid.NewGuid();
     
     public string Data { get; private init; }
 }

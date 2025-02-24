@@ -1,4 +1,4 @@
 namespace Domain.Events.Message;
 
-public class MessageCreatedEvent(int id,  int idChat, byte[] text, int idUser)
-    : MessageBaseEvent(id,id, idChat, text, idUser);
+public class MessageCreatedEvent(Guid  id,  Guid  idChat, byte[] text, Guid  idUser)
+    : MessageBaseEvent(id, idChat, text, idUser);

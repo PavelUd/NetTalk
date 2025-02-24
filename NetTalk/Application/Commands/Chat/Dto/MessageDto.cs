@@ -4,8 +4,8 @@ namespace Application.Chat.Dto;
 
 public class MessageDto
 {
-    public int Id{ get; set; }
-    public int IdChat { get; set; }
+    public Guid  Id{ get; set; }
+    public Guid  IdChat { get; set; }
     
     public string Text { get; set; }    
     

@@ -17,6 +17,7 @@ public class ChatEventHandler(
 {
     public async Task Handle(ChatCreatedEvent notification, CancellationToken cancellationToken)
     {
+        
         LogEvent(notification);
         var customerQueryModel = mapper.Map<ChatQueryModel>(notification);
         await synchronizeDb.UpsertAsync(customerQueryModel, filter => filter.Id == customerQueryModel.Id);

@@ -1,6 +1,8 @@
+using Application.Common.Interfaces.Repositories.Query;
 using Application.Common.Result;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
+using Application.Queries.QueryModels;
 using Application.Users.Dto;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -9,30 +11,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Queries.User;
 
-public class GetAllUsersQuery : IRequest<Result<List<UserDto>>>
+public class GetAllUsersQuery : IRequest<Result<List<UserQueryModel>>>
 {
     
 }
 
-internal class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Result<List<UserDto>>>
+internal class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Result<List<UserQueryModel>>>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-    private readonly IUser _user;
+    private readonly IUserReadOnlyRepository _readOnlyRepository;
 
 
-    public GetAllUsersQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUser user)
+    public GetAllUsersQueryHandler(IUserReadOnlyRepository readOnlyRepository)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        _user = user;
+        _readOnlyRepository = readOnlyRepository;
     }
     
-    public async Task<Result<List<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<UserQueryModel>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = _unitOfWork.UserRepository
-            .FindByCondition(us => !us.Chats.Any(ch => ch.Users.Any(u => u.Id == _user.Id)))
-            .ProjectTo<UserDto>(_mapper.ConfigurationProvider);
-        return await Result<List<UserDto>>.SuccessAsync(await users.ToListAsync(cancellationToken: cancellationToken));
+        var users = await _readOnlyRepository.GetAllAsync();
+        
+        return await Result<List<UserQueryModel>>.SuccessAsync(users.ToList());
     }
 }

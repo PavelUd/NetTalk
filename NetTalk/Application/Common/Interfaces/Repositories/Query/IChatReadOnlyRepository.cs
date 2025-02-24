@@ -6,5 +6,5 @@ public interface IChatReadOnlyRepository
 {
     public Task<IEnumerable<ChatQueryModel>> GetAllAsync();
     
-    public Task<ChatQueryModel> GetByIdAsync(int id);
+    public Task<ChatQueryModel> GetByIdAsync(Guid id);
 }

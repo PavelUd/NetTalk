@@ -14,7 +14,7 @@ public class Message : BaseAuditableEntity
         
     }
 
-    public Message(int idChat, int idUser, byte[] text)
+    public Message(Guid idChat, Guid  idUser, byte[] text)
     {
         IdChat = idChat;
         IdUser = idUser;
@@ -26,13 +26,13 @@ public class Message : BaseAuditableEntity
     }
     
     [Column("id_chat")]
-    public int IdChat { get; set; }
+    public Guid   IdChat { get; set; }
     
     [Column("message")]
     public byte[] Text { get; set; }    
     
     [Column("id_user")]
-    public int IdUser { get; set; }
+    public Guid  IdUser { get; set; }
     public List<File> Files { get; set; }
     public List<MessageStatus> StatusList { get; set; }
     
@@ -41,6 +41,6 @@ public class Message : BaseAuditableEntity
         if (_isDeleted) return;
 
         _isDeleted = true;
-        AddDomainEvent(new MessageDeletedEvent(Id, Id, IdChat,Text, IdUser));
+ //       AddDomainEvent(new MessageDeletedEvent(Id, Id, IdChat,Text, IdUser));
     }
 }

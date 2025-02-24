@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Common;
+using Domain.Events.User;
 
 namespace Domain.Entities;
 
@@ -29,4 +30,23 @@ public class User : BaseEntity
     
     public SymmetricKey Key{ get; set; }
     public List<Chat> Chats{ get; set; }
+
+    public User()
+    {
+        
+    }
+
+    public User(string login, string password, string fullName, string salt, string avatarUrl, SymmetricKey key)
+    {
+        Login = login;
+        Password = password;
+        FullName = fullName;
+        Salt = salt;
+        AvatarUrl = avatarUrl;
+        IsActive = true;
+        LastOnline = DateTime.Now.ToUniversalTime();
+        Key = key;
+        
+        AddDomainEvent(new UserCreatedEvent(Id, fullName, login));
+    }
 }

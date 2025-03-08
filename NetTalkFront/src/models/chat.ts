@@ -1,5 +1,12 @@
+import { IMessage } from './message'
+import { IUser } from './user'
+
 export interface IChat {
 	type: string
-	id: string
 	name: string
+	id: string
+	isActive: boolean
+	messages: IMessage[]
+	owner: string
+	users: IUser[]
 }

@@ -1,9 +1,6 @@
 using System.Reflection;
 using Application.Behaviors;
-using Application.Chat.Dto;
 using Application.Common.Interfaces;
-using Application.Queries.Chat;
-using Application.Stories;
 using Domain.Events.Chat;
 using Domain.Events.User;
 using FluentValidation;
@@ -19,7 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddAutoMapper();
         services.AddMediator();
-        services.AddStories();
     }
 
     private static void AddAutoMapper(this IServiceCollection services)
@@ -41,11 +37,4 @@ public static class ServiceCollectionExtensions
         });
         
     }
-
-    private static void AddStories(this IServiceCollection services)
-    {
-        services.AddScoped<CreateChatStory>();
-        services.AddScoped<IStoryResolver, StoryResolver>();
-    }
-
 }

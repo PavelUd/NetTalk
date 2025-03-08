@@ -8,7 +8,6 @@ namespace Domain.Entities;
 public class Message : BaseAuditableEntity
 {
     private bool _isDeleted;
-    
     public Message()
     {
         
@@ -21,8 +20,10 @@ public class Message : BaseAuditableEntity
         Text = text;
         StatusList = new List<MessageStatus>();
         Files = new List<File>();
+        UpdatedDate = DateTime.Now.ToUniversalTime();
+        CreatedDate = DateTime.Now.ToUniversalTime();
         
-        AddDomainEvent(new MessageCreatedEvent(Id, idChat,text, idUser));
+        AddDomainEvent(new MessageCreatedEvent(Id, idChat,text, idUser, UpdatedDate, CreatedDate));
     }
     
     [Column("id_chat")]
@@ -42,5 +43,10 @@ public class Message : BaseAuditableEntity
 
         _isDeleted = true;
  //       AddDomainEvent(new MessageDeletedEvent(Id, Id, IdChat,Text, IdUser));
+    }
+
+    public void MarkAsUpdated()
+    {
+        AddDomainEvent(new MessageUpdatedEvent(Id, IdChat,Text, IdUser));
     }
 }

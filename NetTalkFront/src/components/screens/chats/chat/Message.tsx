@@ -2,8 +2,8 @@ import Image from 'next/image'
 import styles from './Message.module.css'
 
 interface MessageProps {
-	username: string
-	avatarUrl: string
+	username?: string
+	avatarUrl?: string
 	time: string
 	message: string
 	isSelf?: boolean

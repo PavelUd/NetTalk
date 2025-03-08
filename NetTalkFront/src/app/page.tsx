@@ -1,6 +1,6 @@
 import { Chat } from '@/components/screens/chats/chat/Chat'
 import { ChatsList } from '@/components/screens/chats/list/ChatList'
-import { chats } from '@/mocks/chat'
+
 export default function ChatsPage() {
 	return (
 		<div
@@ -10,7 +10,7 @@ export default function ChatsPage() {
 			}}
 		>
 			<ChatsList />
-			<Chat chatData={chats[0]} />
+			<Chat />
 		</div>
 	)
 }

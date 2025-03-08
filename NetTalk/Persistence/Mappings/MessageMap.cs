@@ -15,10 +15,10 @@ public class MessageMap
             classMap.MapMember(chat => chat.Id)
                 .SetIsRequired(true);
 
-            classMap.MapMember(chat => chat.ChatId)
+            classMap.MapMember(chat => chat.IdChat)
                 .SetIsRequired(true);
 
-            classMap.MapMember(chat => chat.UserId)
+            classMap.MapMember(chat => chat.IdUser)
                 .SetIsRequired(true);
 
             classMap.MapMember(chat => chat.IsPinned)

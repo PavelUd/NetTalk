@@ -27,7 +27,6 @@ public class ChatQueryModel : IQueryModel
     public bool IsActive { get; init;}
     public Guid Owner { get; init; }
     public Guid Id { get; init; }
-    
     public string Type { get; init; }
 
     public List<Guid> Participants { get; init; }
@@ -42,7 +41,7 @@ public class ChatQueryModel : IQueryModel
         {
             CreateMap<Domain.Entities.Chat, ChatQueryModel>()
                 .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.Users.Select(us => us.Id)));
-            CreateMap<ChatCreatedEvent, ChatQueryModel>();
+            CreateMap<ChatCreatedEvent, ChatQueryModel>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AggregateId));
             CreateMap<ChatQueryModel, ChatDto>();
         }
     }

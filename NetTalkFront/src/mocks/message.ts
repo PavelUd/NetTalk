@@ -12,6 +12,7 @@ export const messages: IMessage[] = Array.from({ length: 25 }, (_, index) => {
 		id: (index + 1).toString(),
 		text: randomText,
 		createdAt: randomDate,
+		idUser: String(userIndex),
 		sender: users[userIndex],
 	}
 })

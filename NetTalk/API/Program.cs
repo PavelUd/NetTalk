@@ -1,12 +1,13 @@
 using System.Reflection;
+using System.Text;
 using API.Converters;
 using API.Hubs;
-using API.Middlewares;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Infrastructure.Extensions;
 using Infrastructure.Identity.Models;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using NLog;
@@ -16,12 +17,10 @@ using Persistence.Extensions;
 using ILogger = NLog.ILogger;
 
 
-
-var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<ILogger>(_ => LogManager.GetLogger("DefaultLogger"));
 builder.Host.UseNLog();
-
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -51,6 +50,22 @@ builder.Services.AddSignalR();
 builder.Services.Configure<Token>(builder.Configuration.GetSection("token"));
 builder.Services.Configure<ConnectionOptions>(builder.Configuration.GetSection(ConnectionOptions.ConfigSectionPath));
 builder.Services.AddScoped<IUser, IdentityUser>();
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["token:secret"])),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -99,8 +114,10 @@ var app = builder.Build();
 app.UseCors("AllowLocalhost3000");
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseAuthentication();
 app.MapControllers();
+app.UseRouting();
+app.UseAuthorization();
+app.UseEndpoints(endpoints => { endpoints.MapHub<ChatHub>("/chathub"); });
 app.UseHttpsRedirection();
 app.Run();
-
-

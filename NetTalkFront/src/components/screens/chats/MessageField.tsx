@@ -1,5 +1,7 @@
 'use client'
 import Field from '@/components/ui/field/Field'
+import { IMessage } from '@/models/message'
+import { useChatStore } from '@/store/chatStore'
 import { ArrowRightToLine } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -9,6 +11,15 @@ import styles from './MessageFiled.module.css'
 
 export function MessageField() {
 	const [message, setMessage] = useState('')
+	const { setMessages } = useChatStore()
+	const handleClick = () => {
+		const msg = {
+			idUser: 1,
+			text: message,
+		} as IMessage
+		setMessages(msg)
+	}
+
 	const {} = useForm<object>()
 
 	return (
@@ -32,7 +43,7 @@ export function MessageField() {
 					value={message}
 					onChange={e => setMessage(e.target.value)}
 				></Field>
-				<button>
+				<button onClick={handleClick}>
 					<BsSendFill size={20} color='#539edf' />
 				</button>
 			</div>

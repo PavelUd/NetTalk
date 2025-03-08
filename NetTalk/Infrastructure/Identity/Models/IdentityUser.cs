@@ -14,6 +14,10 @@ public class IdentityUser : IUser
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    public IdentityUser()
+    {
+        
+    }
     public IdentityUser(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;

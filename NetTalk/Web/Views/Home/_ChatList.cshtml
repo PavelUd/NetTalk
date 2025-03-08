@@ -1,7 +1,0 @@
-@using Application.Chat.Dto
-@model ChatListModel
-@{
-  var id = int.Parse(Context.User.Claims.FirstOrDefault(cl => cl.Type == "Id")?.Value);
-}
-
-

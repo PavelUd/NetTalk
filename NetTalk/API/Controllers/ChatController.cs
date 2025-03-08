@@ -1,8 +1,10 @@
-using Application.Chat.Commands;
+using Application.Commands.Chat;
+using Application.Commands.Chat.Create;
+using Application.Commands.Message;
 using Application.Common.Interfaces;
 using Application.Queries.Chat;
-using Application.Stories;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -13,12 +15,10 @@ namespace API.Controllers;
 public class ChatController : Controller
 {
     private readonly IMediator _mediator;
-    private readonly IStoryResolver _resolver;
 
-    public ChatController(IMediator mediator, IStoryResolver resolver)
+    public ChatController(IMediator mediator)
     {
         _mediator = mediator;
-        _resolver = resolver;
     }
 
     /// <summary>
@@ -48,16 +48,43 @@ public class ChatController : Controller
     }
     
     
-    /// <summary>
-    /// Метод создания групповых, персональных чатов
-    /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
-    [HttpPost]
-    public async Task<IActionResult> CreateChat([FromBody] List<Guid> idUsers)
+    [Authorize]
+    [HttpPost("{id}/messages")]
+    public async Task<IActionResult> CreateMessage(Guid id, [FromBody] string message)
     {
-        var createChatStory = _resolver.Resolve<CreateChatStory>();
-        var result = await createChatStory.Handle("group", idUsers, "chat");
+        var command = new CreateMessage
+        {
+            IdChat = id,
+            Text = message
+        };
+        var result = await _mediator.Send(command);
         return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+    
+    [Authorize]
+    [HttpDelete("{id}/messages{idMessage}")]
+    public async Task<IActionResult> DeleteMessage(Guid id, Guid idMessage)
+    {
+        var command = new DeleteMessage()
+        {
+            IdChat = id,
+            IdMessage = idMessage
+        };
+        var result = await _mediator.Send(command);
+        return result.Succeeded ? NoContent() : BadRequest(result);
+    }
+    
+    [Authorize]
+    [HttpPatch("{id}/messages{idMessage}")]
+    public async Task<IActionResult> UpdateMessage(Guid id, Guid idMessage, string text)
+    {
+        var command = new UpdateMessage()
+        {
+            IdChat = id,
+            IdMessage = idMessage,
+            Text = text
+        };
+        var result = await _mediator.Send(command);
+        return result.Succeeded ? NoContent() : BadRequest(result);
     }
 }

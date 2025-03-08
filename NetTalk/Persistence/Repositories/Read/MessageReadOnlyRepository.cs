@@ -8,7 +8,7 @@ public class MessageReadOnlyRepository(IReadDbContext readDbContext) : BaseReadO
 {
     public async Task<IEnumerable<MessageQueryModel>> GetChatMessages(Guid idChat)
     {
-        using var asyncCursor = await Collection.FindAsync(queryModel => queryModel.ChatId.Equals(idChat));
+        using var asyncCursor = await Collection.FindAsync(queryModel => queryModel.IdChat.Equals(idChat));
         return await asyncCursor.ToListAsync();
     }
 }

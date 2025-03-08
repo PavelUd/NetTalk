@@ -18,24 +18,28 @@ internal class GetUsersByLoginQueryHandler : IRequestHandler<GetUsersByLoginQuer
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUser _user;
+    private readonly IChatRepository _chatRepository;
+    private readonly IUserRepository _userRepository;
 
 
-    public GetUsersByLoginQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUser user)
+    public GetUsersByLoginQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUser user, IChatRepository chatRepository, IUserRepository userRepository)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         this._user = user;
+        _chatRepository = chatRepository;
+        _userRepository = userRepository;
     }
     
     public async Task<Result<List<UserDto>>> Handle(GetUsersByLoginQuery request, CancellationToken cancellationToken)
     {
-        var users = _unitOfWork.UserRepository
+        var users =  _userRepository
                 .FindByCondition(us =>us.Id != _user.Id && us.FullName.ToLower().StartsWith(request.Login.ToLower()))
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider).ToList();
         foreach (var user in users)
         {
             var ids = new Guid [] { user.Id, _user.Id };
-            var chat = _unitOfWork.ChatRepository
+            var chat =  _chatRepository
                 .FindByCondition(c => ids.All(id => c.Users.Any(us => us.Id == id))).FirstOrDefault();
         }
         return await Result<List<UserDto>>.SuccessAsync( users);

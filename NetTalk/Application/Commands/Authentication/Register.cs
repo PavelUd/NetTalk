@@ -17,9 +17,11 @@ public record RegisterCommand : IRequest<Result<string>>
 
 
 internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordEncryptor encryptionService,
-        ISymmetricKeyEncryptor keyEncryptor, IUnitOfWork unitOfWork)
+        ISymmetricKeyEncryptor keyEncryptor, IUnitOfWork unitOfWork, IUserRepository userRepository)
     : IRequestHandler<RegisterCommand, Result<string>>
 {
+    private readonly IUserRepository _userRepository = userRepository;
+
     private readonly List<string> _avatars = new List<string>()
     {
         "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
@@ -49,7 +51,7 @@ internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordE
             var user = new User(request.Email, passwordHash, request.Login, salt,
                 _avatars[random.Next(_avatars.Count)], userKey);
             
-            await unitOfWork.UserRepository.AddAsync(user);
+            await  _userRepository.AddAsync(user);
             await unitOfWork.SaveChangesAsync();
             return await service.Authenticate(request.Email, request.Password);
         }
@@ -61,6 +63,6 @@ internal class  RegisterCommandHandler(IAuthenticationService service,IPasswordE
 
     private bool IsUniqueLogin(string login)
     {
-        return !unitOfWork.UserRepository.FindAll().Any(u => u.Login == login);
+        return ! _userRepository.FindAll().Any(u => u.Login == login);
     }
 }

@@ -17,12 +17,12 @@ namespace Infrastructure.Identity;
 public class AuthenticationService : IAuthenticationService
 {
     private readonly Token _token;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
 
     public AuthenticationService(
-        IOptions<Token> tokenOptions, IUnitOfWork unitOfWork)
+        IOptions<Token> tokenOptions, IUserRepository userRepository)
     {
-        _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _token = tokenOptions.Value;
     }
     
@@ -59,7 +59,7 @@ public class AuthenticationService : IAuthenticationService
 
     private User? GetUserByLogin(string login)
     {
-        return _unitOfWork.UserRepository.FindByCondition(us => us.Login == login).FirstOrDefault();
+        return  _userRepository.FindByCondition(us => us.Login == login).FirstOrDefault();
     }
     
     private async Task<string> GenerateJwtToken(User user)

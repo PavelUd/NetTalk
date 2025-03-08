@@ -11,9 +11,11 @@ export const chats = Array.from({ length: 5 }, (_, index) => {
 	return {
 		id: (index + 1).toString(),
 		avatar: '',
+		isActive: true,
 		name: `Chat ${index + 1}`,
 		type: 'personal',
 		messages: chatMessages,
 		users: [user1, user2],
+		owner: '1',
 	}
 })

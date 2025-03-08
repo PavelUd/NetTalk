@@ -5,7 +5,7 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+using Newtonsoft.Json;
 using Persistence.Contexts;
 
 namespace Persistence.Repositories;
@@ -25,17 +25,6 @@ public class UnitOfWork : IUnitOfWork
         _mediator = mediator;
         _eventStoreRepository = eventStoreRepository;
         _logger = logger;
-    }
-
-    public IChatRepository ChatRepository
-    {
-        get { return _chatRepository ??= new ChatRepository(_context); }
-    }
-
-    public IUserRepository UserRepository
-    {
-         get {return _userRepository ??= new UserRepository(_context); }
-         
     }
 
     public async Task SaveChangesAsync()
@@ -96,7 +85,7 @@ public class UnitOfWork : IUnitOfWork
         var domainEvents = entities.SelectMany(x => x.Entity.DomainEvents)
             .ToList();
         var eventStores = domainEvents
-            .ConvertAll(@event => new EventStore(@event.AggregateId, @event.GetType().ToString(), @event.ToJson()));
+            .ConvertAll(@event => new EventStore(@event.AggregateId, @event.GetType().ToString(), JsonConvert.SerializeObject(@event.AggregateId)));
         
         entities.ForEach(entry => entry.Entity.ClearDomainEvents());
         return (domainEvents, eventStores) ;

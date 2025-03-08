@@ -1,12 +1,8 @@
 'use client'
 
-import { $fetch } from '@/api/api.fetch'
 import Field from '@/components/ui/field/Field'
 import { useAuth } from '@/hooks/useAuth'
-import { chatSummaries } from '@/mocks/chatSummary'
-import { IChatSummary } from '@/models/chatSummary'
-import { useQuery } from '@tanstack/react-query'
-import { Loader } from 'lucide-react'
+import { useChatStore } from '@/store/chatStore'
 import { PiHashFill } from 'react-icons/pi'
 import { SlMagnifier } from 'react-icons/sl'
 import { TbEditCircle } from 'react-icons/tb'
@@ -14,15 +10,32 @@ import styles from './ChatList.module.scss'
 import { ChatListItem } from './ChatListItem'
 
 export function ChatsList() {
+	const { chats } = useChatStore()
+	console.log(chats)
 	const { user, isLoggedIn } = useAuth()
-
+	/*
 	const { data, isLoading, isFetching } = useQuery({
 		queryKey: ['chats'],
 		queryFn: () => $fetch.get('api/chats'),
 		enabled: isLoggedIn,
 	})
-
-	console.log(data, isLoading, isFetching)
+		<div>
+					{isLoading || isFetching ? (
+						<div className='p-layout'>
+							<Loader />
+						</div>
+					) : (
+						<div>
+							{data?.data.map((chatSummary: IChatSummary) => (
+								<ChatListItem
+									key={`${chatSummary.id}`}
+									chatSummary={chatSummary}
+								/>
+							))}
+						</div>
+					)}
+				</div>
+*/
 	return (
 		<div className={styles.container}>
 			<div className={styles.headerContainer}>
@@ -53,7 +66,7 @@ export function ChatsList() {
 						<PiHashFill className={styles.hashIcon} size={20} />
 						<span className={styles.groupsLabel}>GROUPS & CHANNELS</span>
 					</div>
-					{chatSummaries.map(chatSummary => (
+					{chats.map(chatSummary => (
 						<ChatListItem
 							key={`${chatSummary.name}-12233332`}
 							chatSummary={chatSummary}
@@ -61,22 +74,6 @@ export function ChatsList() {
 					))}
 				</div>
 				<div className={styles.allMessagesLabel}>All MESSAGES</div>
-				<div>
-					{isLoading || isFetching ? (
-						<div className='p-layout'>
-							<Loader />
-						</div>
-					) : (
-						<div>
-							{data?.data.map((chatSummary: IChatSummary) => (
-								<ChatListItem
-									key={`${chatSummary.id}`}
-									chatSummary={chatSummary}
-								/>
-							))}
-						</div>
-					)}
-				</div>
 			</div>
 		</div>
 	)

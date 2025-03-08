@@ -1,7 +1,7 @@
 'use client'
 import Avatar from '@/components/ui/avatar/Avatar'
 import { IChatSummary } from '@/models/chatSummary'
-import Link from 'next/link'
+import { useChatStore } from '@/store/chatStore'
 
 interface ChatListItemProps {
 	chatSummary: IChatSummary
@@ -20,15 +20,21 @@ interface ChatListItemProps {
 */
 
 export const ChatListItem: React.FC<ChatListItemProps> = ({ chatSummary }) => {
+	const { setCurrentChat } = useChatStore()
+	const handleClick = () => {
+		console.log(chatSummary.id)
+		setCurrentChat(chatSummary.id)
+	}
 	return (
-		<Link
-			href={`/chat/${chatSummary.id}`}
+		<div
+			key={chatSummary.id}
+			onClick={handleClick}
 			className='p-layout flex items-center border-b border-border duration-300 ease-linear transition-colors hover:bg-border'
 		>
 			<Avatar
 				name={`${chatSummary.name}`}
 				size={50}
-				bgColor='#127f73'
+				bgColor='#a70db5'
 				textColor='#fff'
 			/>
 			<div className='text-sm w-full pl-2' style={{ fontWeight: 300 }}>
@@ -41,6 +47,6 @@ export const ChatListItem: React.FC<ChatListItemProps> = ({ chatSummary }) => {
 					<div className='opacity-30 mt-0.2'>6:55</div>
 				</div>
 			</div>
-		</Link>
+		</div>
 	)
 }

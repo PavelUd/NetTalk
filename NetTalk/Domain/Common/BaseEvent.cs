@@ -6,6 +6,8 @@ public class BaseEvent : INotification
     /// <summary>
     /// Gets the type of the message.
     /// </summary>
+    ///
+    /// 
      public Guid Id { get; set; } = Guid.NewGuid();
     public string MessageType { get; protected init; }
 

@@ -23,7 +23,7 @@ public class Chat : BaseAuditableEntity
         UpdatedDate = DateTime.Now.ToUniversalTime();
         CreatedDate = DateTime.Now.ToUniversalTime();
 
-        AddDomainEvent(new ChatCreatedEvent(name, type, isActive, users.Select(user => user.Id).ToList(), owner));
+        AddDomainEvent(new ChatCreatedEvent(Id, name, type, isActive, users.Select(user => user.Id).ToList(), owner));
     }
     
     [Column("chat_name")]

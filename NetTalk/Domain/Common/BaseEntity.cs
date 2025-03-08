@@ -20,4 +20,6 @@ public class BaseEntity: IEntity
     public void ClearDomainEvents() =>
         _domainEvents.Clear();
     
+    
+    
 }

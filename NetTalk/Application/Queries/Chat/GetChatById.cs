@@ -19,13 +19,17 @@ namespace Application.Queries.Chat;
  
 internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Result<ChatDto>>
 {
+    private readonly IMessageEncryptor _messageEncryptor;
+    private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
     private readonly IChatReadOnlyRepository _chatRepository;
     private readonly IMessageReadOnlyRepository _messageRepository;
     private readonly IUserReadOnlyRepository _userRepository;
 
-    public GetOfficeByIdQueryHandler(IMapper mapper, IChatReadOnlyRepository repository, IMessageReadOnlyRepository messageRepository, IUserReadOnlyRepository userRepository)
+    public GetOfficeByIdQueryHandler(IMessageEncryptor messageEncryptor,IUserRepository writeUserRepository, IMapper mapper, IChatReadOnlyRepository repository, IMessageReadOnlyRepository messageRepository, IUserReadOnlyRepository userRepository)
     {
+        _messageEncryptor = messageEncryptor;
+        _repository = writeUserRepository;
         _mapper = mapper;
         _chatRepository = repository;
         _messageRepository = messageRepository;
@@ -41,7 +45,7 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
             var members = await GetChatMembers(chat.Participants);
             var chatDto = _mapper.Map<ChatDto>(chat);
             chatDto.Users = members;
-            chatDto.Messages = chatMessages.ToList();
+            chatDto.Messages = chatMessages.Select(DecodeMessage).ToList();
             
             return await Result<ChatDto>.SuccessAsync(chatDto);
         }
@@ -62,6 +66,13 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
         }
         return list;
     }
-    
+
+    private MessageQueryModel DecodeMessage(MessageQueryModel messageQueryModel)
+    {
+        var user = _repository.FindByCondition(u => u.Id == messageQueryModel.IdUser).Include(user => user.Key).First();
+        var text = _messageEncryptor.DecryptMessage(messageQueryModel.EncryptText, user.Key.Key, user.Key.IV);
+        messageQueryModel.Text = text;
+        return messageQueryModel;
+    }
     
 }

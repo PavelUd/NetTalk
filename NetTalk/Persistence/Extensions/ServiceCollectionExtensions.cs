@@ -1,4 +1,5 @@
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Repositories.Commands;
 using Application.Common.Interfaces.Repositories.Query;
 using Application.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using Persistence.Contexts;
 using Persistence.Mappings;
 using Persistence.Repositories;
 using Persistence.Repositories.Read;
+using Persistence.Repositories.Write;
 
 namespace Persistence.Extensions;
 
@@ -49,6 +51,8 @@ public static class ServiceCollectionExtensions
         services
             .AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork))
             .AddTransient<IChatRepository, ChatRepository>()
+            .AddTransient<IUserRepository, UserRepository>()
+            .AddTransient<IMessageRepository, MessageRepository>()
             .AddTransient<IEventStoreRepository, EventStoreRepository>()
             .AddScoped<IChatReadOnlyRepository, ChatReadOnlyRepository>()
             .AddScoped<IMessageReadOnlyRepository, MessageReadOnlyRepository>()

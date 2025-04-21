@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Repositories.Query;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Configuration;
@@ -61,6 +60,21 @@ public sealed class ReadNetTalkDbContext: IReadDbContext, ISynchronizeDb
         await collection.ReplaceOneAsync(upsertFilter, queryModel, DefaultReplaceOptions);
     }
     
+    public async Task UpdateAsync<TQueryModel>(Expression<Func<TQueryModel, bool>> filter, UpdateDefinition<TQueryModel> update)
+        where TQueryModel : class, IQueryModel
+    {
+        var collection = GetCollection<TQueryModel>();
+        var result = await collection.UpdateOneAsync(filter, update);
+        
+    }
+    
+    public async Task DeleteAsync<TQueryModel>(Expression<Func<TQueryModel, bool>> deleteFilter)
+            where TQueryModel :  class,IQueryModel
+        {
+            var collection = GetCollection<TQueryModel>();
+            await collection.DeleteOneAsync(deleteFilter);
+        }
+
     #endregion
     
     #region IDisposable

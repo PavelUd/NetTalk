@@ -34,8 +34,15 @@ public class MessageQueryModel : IQueryModel
     {
         public Mapping()
         {
-            
+            CreateMap<Domain.Entities.Message, MessageQueryModel>()
+                .ForMember(dest => dest.EncryptText, opt => opt.MapFrom(src => src.Text)).ReverseMap();;
             CreateMap<MessageCreatedEvent, MessageQueryModel>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AggregateId))
+                .ForMember(dest => dest.EncryptText, opt => opt.MapFrom(src => src.Text)).ReverseMap();
+            CreateMap<MessageUpdatedEvent, MessageQueryModel>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AggregateId))
+                .ForMember(dest => dest.EncryptText, opt => opt.MapFrom(src => src.Text)).ReverseMap();
+            CreateMap<MessageDeletedEvent, MessageQueryModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AggregateId))
                 .ForMember(dest => dest.EncryptText, opt => opt.MapFrom(src => src.Text)).ReverseMap();
         }

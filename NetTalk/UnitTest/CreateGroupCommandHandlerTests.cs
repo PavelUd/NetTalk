@@ -9,16 +9,11 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Persistence.Repositories;
+using UnitTest.common;
 using Xunit.Categories;
 
 namespace UnitTest;
 
-public class UserTests : IUser
-{
-    public Guid Id { get; init; }
-    public string Name { get; }
-    public string AvatarUrl { get; init; }
-}
 
 [UnitTest]
 public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : IClassFixture<NetTalkWriteDbFixture>
@@ -33,7 +28,7 @@ public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : ICl
             Substitute.For<IEventStoreRepository>(),
             Substitute.For<ILogger<UnitOfWork>>());
         var repository = new UserRepository(fixture.DbContext);
-        var testUser = CreateTestUser();
+        var testUser = TestHelper.CreateTestUser();
         await repository.AddAsync(testUser);
         await unitOfWork.SaveChangesAsync();
         // Arrange
@@ -43,7 +38,7 @@ public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : ICl
             command.Users = new HashSet<Guid>();
 
         var handler = new CreateGroupCommandHandler(unitOfWork,
-            new UserTests
+            new TestUser()
             {
                 Id = testUser.Id,
             },
@@ -59,19 +54,7 @@ public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : ICl
         act.Succeeded.Should().BeTrue(); ;
         act.Data.Should().NotBe(Guid.Empty);
     }
-
-    private User CreateTestUser()
-    {
-       var testUser =  new Faker<User>()
-            .RuleFor(u => u.Login, f => f.Name.FirstName())
-            .RuleFor(u => u.FullName, f => f.Person.FullName)
-            .Generate();
-        testUser.Id = Guid.NewGuid();
-        testUser.Password = "Test";
-        testUser.Salt = "Test";
-        testUser.AvatarUrl = "Test";
-        return testUser;
-    }
+    
 
     [Fact]
     public async Task Add_InvalidUsersAsMembers_ShouldReturnsCreatedResult()
@@ -83,7 +66,7 @@ public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : ICl
             Substitute.For<IEventStoreRepository>(),
             Substitute.For<ILogger<UnitOfWork>>());
         var repository = new UserRepository(fixture.DbContext);
-        var testUser = CreateTestUser();
+        var testUser =TestHelper.CreateTestUser();
         await repository.AddAsync(testUser);
         await unitOfWork.SaveChangesAsync();
         // Arrange
@@ -93,10 +76,10 @@ public class CreateGroupCommandHandlerTests(NetTalkWriteDbFixture fixture) : ICl
         command.Users = new HashSet<Guid>();
         for (var i = 0; i < 3; i++)
         {
-            command.Users.Add(CreateTestUser().Id);
+            command.Users.Add(TestHelper.CreateTestUser().Id);
         }
         var handler = new CreateGroupCommandHandler(unitOfWork,
-            new UserTests
+            new TestUser()
             {
                 Id = testUser.Id,
             },

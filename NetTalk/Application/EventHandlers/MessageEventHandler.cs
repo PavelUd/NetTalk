@@ -12,7 +12,7 @@ namespace Application.EventHandlers;
 public class MessageEventHandler(
     ILogger<ChatEventHandler> logger, 
     IMapper mapper, 
-    ISynchronizeDb synchronizeDb) : INotificationHandler<MessageCreatedEvent>
+    ISynchronizeDb synchronizeDb) : INotificationHandler<MessageCreatedEvent>,  INotificationHandler<MessageUpdatedEvent>, INotificationHandler<MessageDeletedEvent>
 {
 
     public async Task Handle(MessageCreatedEvent notification, CancellationToken cancellationToken)
@@ -23,6 +23,22 @@ public class MessageEventHandler(
         
     }
     
+    public async Task Handle(MessageUpdatedEvent notification, CancellationToken cancellationToken)
+    {
+        LogEvent(notification);
+        var messageQueryModel = mapper.Map<MessageQueryModel>(notification);
+        await synchronizeDb.UpsertAsync(messageQueryModel, filter => filter.Id == messageQueryModel.Id);
+        
+    }
+    
+    public async Task Handle(MessageDeletedEvent notification, CancellationToken cancellationToken)
+    {
+        LogEvent(notification);
+        var messageQueryModel = mapper.Map<MessageQueryModel>(notification);
+        await synchronizeDb.DeleteAsync<MessageQueryModel>(filter => filter.Id == messageQueryModel.Id);
+    }
+    
     private void LogEvent<TEvent>(TEvent @event) where TEvent : MessageBaseEvent =>
         logger.LogInformation("----- Triggering the event {EventName}, model: {EventModel}", typeof(TEvent).Name, @event.ToJson());
+    
 }

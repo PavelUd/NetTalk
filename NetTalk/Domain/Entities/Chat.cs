@@ -40,4 +40,9 @@ public class Chat : BaseAuditableEntity
     
     public List<Message> Messages { get; set; }
     public List<User> Users { get; set; }
+
+    public void UpdateLastMessage(Message message)
+    {
+        AddDomainEvent(new ChatLastMessageUpdatedEvent(Id, message));
+    }
 }

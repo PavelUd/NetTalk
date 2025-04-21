@@ -4,9 +4,8 @@ using Application.Interfaces;
 
 namespace Infrastructure.Encryption;
 
-public class MessageEncryptor(ISymmetricKeyEncryptor symmetricKeyEncryptor) : IMessageEncryptor
+public class MessageEncryptor() : IMessageEncryptor
 {
-    private readonly ISymmetricKeyEncryptor _symmetricKeyEncryptor = symmetricKeyEncryptor;
 
     public byte[] EncryptMessage(byte[] key, byte[] iv, string message)
     {

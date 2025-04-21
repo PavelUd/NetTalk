@@ -18,7 +18,6 @@ public class Message : BaseAuditableEntity
         IdChat = idChat;
         IdUser = idUser;
         Text = text;
-        StatusList = new List<MessageStatus>();
         Files = new List<File>();
         UpdatedDate = DateTime.Now.ToUniversalTime();
         CreatedDate = DateTime.Now.ToUniversalTime();
@@ -35,14 +34,13 @@ public class Message : BaseAuditableEntity
     [Column("id_user")]
     public Guid  IdUser { get; set; }
     public List<File> Files { get; set; }
-    public List<MessageStatus> StatusList { get; set; }
     
     public void MarkAsDeleted()
     {
         if (_isDeleted) return;
 
         _isDeleted = true;
- //       AddDomainEvent(new MessageDeletedEvent(Id, Id, IdChat,Text, IdUser));
+      AddDomainEvent(new MessageDeletedEvent(Id, IdChat,Text, IdUser));
     }
 
     public void MarkAsUpdated()

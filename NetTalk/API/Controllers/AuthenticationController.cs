@@ -1,4 +1,5 @@
 using Application.Authentication.Command;
+using Application.Commands.Authentication;
 using Application.Queries.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,14 +42,68 @@ public class AuthenticationController : Controller
 
         return Unauthorized(new { message = "Неверный логин или пароль" });
     }
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> Authenticate([FromBody] RefreshTokenLogin query)
+    {
+         
+        var token = await _mediator.Send(query);
+
+        if (token.Succeeded)
+        {
+            return Ok(token);
+        }
+
+        return Unauthorized(new { message = "Неверный логин или пароль" });
+    }
+
+    
     
     /// <summary>
-    /// Метод регистрации
+    /// Метод подтверждения регистрации 
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
+    [HttpPost("verify")]
+    public async Task<IActionResult> Confirm([FromBody] ConfirmCommand query)
+    {
+        var token = await _mediator.Send(query);
+
+        if (token.Succeeded)
+        {
+            return Ok(token);
+        }
+
+        return BadRequest(new { message = token.Errors });
+    }
+        
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterCommand query)
+    {
+        var token = await _mediator.Send(query);
+
+        if (token.Succeeded)
+        {
+            return Ok(token);
+        }
+
+        return Unauthorized(new { message = token.Errors });
+    }
+    
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> SendRequestPasswordReset([FromBody] RequestPasswordReset query)
+    {
+        var token = await _mediator.Send(query);
+
+        if (token.Succeeded)
+        {
+            return Ok(token);
+        }
+
+        return Unauthorized(new { message = token.Errors });
+    }
+    
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> SendRequestPasswordReset([FromBody] ResetPassword query)
     {
         var token = await _mediator.Send(query);
 

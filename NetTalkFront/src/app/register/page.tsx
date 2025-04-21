@@ -1,13 +1,26 @@
-import type { Metadata } from 'next'
+'use client'
+import { Confirm } from '@/components/screens/auth/Confirm'
+import { Register } from '@/components/screens/auth/Register'
+import { AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
 
-import { Auth } from '@/components/screens/auth/Auth'
-import { NO_INDEX_PAGE } from '@/const/seo.const'
+export default function Home() {
+	const [step, setStep] = useState(0)
 
-export const metadata: Metadata = {
-	title: 'Register',
-	...NO_INDEX_PAGE,
-}
-
-export default function RegisterPage() {
-	return <Auth type='Register' />
+	return (
+		<div className='flex w-screen h-screen items-center justify-center bg-[#0f0f10]'>
+			<div
+				className='border-t border-border p-7 rounded-xl shadow-[15px_15px_45px_#010101] relative overflow-hidden'
+				style={{ background: '#18181c', width: '450px', minHeight: '300px' }}
+			>
+				<AnimatePresence mode='wait'>
+					{step === 0 ? (
+						<Register key='register' onClick={() => setStep(1)} />
+					) : (
+						<Confirm key='confirm' onClick={() => setStep(0)} />
+					)}
+				</AnimatePresence>
+			</div>
+		</div>
+	)
 }

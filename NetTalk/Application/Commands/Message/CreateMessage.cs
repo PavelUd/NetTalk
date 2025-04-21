@@ -15,7 +15,7 @@ public record CreateMessage : IRequest<Result<MessageDto>>
     public string Text { get; set; }
 }
 
-internal class AddMessageHandler : IRequestHandler<CreateMessage, Result<MessageDto>>
+public class AddMessageHandler : IRequestHandler<CreateMessage, Result<MessageDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
@@ -24,7 +24,8 @@ internal class AddMessageHandler : IRequestHandler<CreateMessage, Result<Message
     private readonly IUser _user;
     private readonly IMessageEncryptor _encryptor;
 
-    public AddMessageHandler(IMapper mapper, IUnitOfWork unitOfWork,
+    public AddMessageHandler(
+        IUnitOfWork unitOfWork,
         IUserRepository userRepository,
         IChatRepository chatRepository, 
         IMessageRepository repository, 
@@ -53,6 +54,7 @@ internal class AddMessageHandler : IRequestHandler<CreateMessage, Result<Message
             var message = new Domain.Entities.Message(request.IdChat, _user.Id, encryptedMessage);
             
             await _repository.AddAsync(message);
+            chat.UpdateLastMessage(message);
             await _unitOfWork.SaveChangesAsync();
             
             return await Result<MessageDto>.SuccessAsync(new MessageDto(message, request.Text, _user));

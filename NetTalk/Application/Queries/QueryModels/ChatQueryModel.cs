@@ -31,6 +31,8 @@ public class ChatQueryModel : IQueryModel
 
     public List<Guid> Participants { get; init; }
     
+    public MessageQueryModel? LastMessage { get; init; }
+    
     [BsonId]
     [BsonIgnoreIfDefault]
     public ObjectId ObjectId { get; init; }

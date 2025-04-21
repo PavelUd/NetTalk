@@ -5,10 +5,10 @@ namespace Domain.Common;
 
 public class BaseAuditableEntity : BaseEntity, IAuditableEntity
 {
-        
-    [Column("created_at")]
-    public DateTime? CreatedDate { get; set; }
+
+    [Column("created_at")] 
+    public DateTime? CreatedDate { get; set; } = DateTime.Now.ToUniversalTime();
 
     [Column("updated_at")]
-    public DateTime? UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; } = DateTime.Now.ToUniversalTime();
 }

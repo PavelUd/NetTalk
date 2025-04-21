@@ -61,7 +61,7 @@ export function Auth({ type }: IAuth) {
 			alt: 'X',
 		},
 	]
-
+	const router = useRouter()
 	return (
 		<div className='flex w-screen h-screen items-center justify-center'>
 			<form
@@ -97,7 +97,13 @@ export function Auth({ type }: IAuth) {
 					<span style={{ opacity: 0.4, paddingRight: '2px' }}>
 						Dont't have an accaunt yet?{' '}
 					</span>
-					<span className='text-sm'>Sing up</span>
+					<button
+						type='button'
+						onClick={() => router.push('/register')}
+						className='text-sm'
+					>
+						Sing up
+					</button>
 				</div>
 				<Field
 					{...register('email', {

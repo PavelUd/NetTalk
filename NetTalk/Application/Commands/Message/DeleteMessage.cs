@@ -1,4 +1,3 @@
-using Application.Chat.Dto;
 using Application.Common.Interfaces.Repositories.Commands;
 using Application.Common.Result;
 using Application.Interfaces;
@@ -16,12 +15,14 @@ public record DeleteMessage : IRequest<Result<bool>>
 public class DeleteMessageHandler : IRequestHandler<DeleteMessage, Result<bool>>
 {
     private readonly IMessageRepository _repository;
+    private readonly IChatRepository _chatRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUser _user;
     
-    public DeleteMessageHandler(IMessageRepository repository, IUser user, IUnitOfWork unitOfWork)
+    public DeleteMessageHandler(IMessageRepository repository,IChatRepository chatRepository, IUser user, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _chatRepository = chatRepository;
         _user = user;
         _unitOfWork = unitOfWork;
     }
@@ -29,22 +30,14 @@ public class DeleteMessageHandler : IRequestHandler<DeleteMessage, Result<bool>>
     {
         try
         {
+           
             var message = _repository.FindByCondition(m => m.Id == request.IdMessage).FirstOrDefault();
-            if (message == null)
+            var result = ValidateMessage(request, message);
+            if (!result.Succeeded)
             {
-                return await Result<bool>.FailureAsync("Message not found");
+                return result;
             }
-
-            if (message.IdUser != _user.Id)
-            {
-                return await Result<bool>.FailureAsync("You cannot delete this message");
-            }
-
-            if (message.IdChat != request.IdChat)
-            {
-                return await Result<bool>.FailureAsync("You cannot delete this message");
-            }
-            
+            UpdateChatLastMessage(message.IdChat, message);
             await _repository.DeleteAsync(message);
             await _unitOfWork.SaveChangesAsync();
             return await Result<bool>.SuccessAsync(true);
@@ -53,5 +46,36 @@ public class DeleteMessageHandler : IRequestHandler<DeleteMessage, Result<bool>>
         {
             return await Result<bool>.FailureAsync(ex.Message);
         }
+    }
+
+    private Result<bool> ValidateMessage(DeleteMessage request, Domain.Entities.Message message)
+    {
+        if (message == null)
+        {
+            return Result<bool>.Failure("Message not found");
+        }
+
+        if (message.IdUser != _user.Id)
+        {
+            return  Result<bool>.Failure("You cannot delete this message");
+        }
+
+        if (message.IdChat != request.IdChat)
+        {
+            return Result<bool>.Failure("You cannot delete this message");
+        }
+
+        return  Result<bool>.Success(true);
+    }
+
+    private void UpdateChatLastMessage(Guid chatId, Domain.Entities.Message message)
+    {
+        var chat = _chatRepository.FindByCondition(us => us.Id == chatId).FirstOrDefault();
+        var lastMessage = _repository
+            .FindByCondition(m => m.IdChat == message.IdChat)
+            .OrderByDescending(m => m.CreatedDate)
+            .FirstOrDefault();
+        
+        chat?.UpdateLastMessage(lastMessage);
     }
 }

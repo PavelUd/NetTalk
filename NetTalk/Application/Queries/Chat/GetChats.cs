@@ -19,16 +19,18 @@ public record GetChatsQuery : IRequest<Result<List<ChatQueryModel>>>
 
 internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result<List<ChatQueryModel>>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public IUserRepository _keyRepository;
+    private readonly IMessageEncryptor _messageEncryptor;
     private readonly IUser _user;
     private readonly IChatReadOnlyRepository _chatRepository;
     private readonly IUserReadOnlyRepository _userRepository;
 
-    public GetChatsQueryQueryHandler(IUser user, IChatReadOnlyRepository readOnlyRepository, IUserReadOnlyRepository userReadOnlyRepository, IUnitOfWork unitOfWork)
+    public GetChatsQueryQueryHandler(IUser user, IChatReadOnlyRepository readOnlyRepository,IUserRepository userRepository, IUserReadOnlyRepository userReadOnlyRepository, IMessageEncryptor messageEncryptor)
     {
+        _keyRepository = userRepository;
         _user = user;
         _userRepository = userReadOnlyRepository;
-        _unitOfWork = unitOfWork;
+        _messageEncryptor = messageEncryptor;
         _chatRepository = readOnlyRepository;
     }
 
@@ -40,12 +42,17 @@ internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result
             var chatList = chats.ToList();
             foreach (var chat in chatList)
             {
+                if (chat.LastMessage != null)
+                {
+                    chat.LastMessage.Text = DecodeMessage(chat.LastMessage);
+                }
                 if (chat.Type != "direct")
                     continue;
 
                 var otherUserId = chat.Participants.First(id => id != _user.Id);
                 var otherUser = await _userRepository.GetByIdAsync(otherUserId);
                 chat.Name = otherUser.Username;
+
                 chat.Url = otherUser.Avatar;
             }
             return await Result<List<ChatQueryModel>>.SuccessAsync(chatList);
@@ -54,5 +61,12 @@ internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result
         {
            return await Result<List<ChatQueryModel>>.FailureAsync(e.Message);
         }
+    }
+    
+    private string DecodeMessage(MessageQueryModel messageQueryModel)
+    {
+            var user = _keyRepository.FindByCondition(u => u.Id == messageQueryModel.IdUser).Include(user => user.Key).First();
+            var text = _messageEncryptor.DecryptMessage(messageQueryModel.EncryptText, user.Key.Key, user.Key.IV);
+            return text;
     }
 }

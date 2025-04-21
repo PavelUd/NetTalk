@@ -56,8 +56,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<IEventStoreRepository, EventStoreRepository>()
             .AddScoped<IChatReadOnlyRepository, ChatReadOnlyRepository>()
             .AddScoped<IMessageReadOnlyRepository, MessageReadOnlyRepository>()
-            .AddScoped<IUserReadOnlyRepository, UserReadOnlyRepository>();
-        
+            .AddScoped<IUserReadOnlyRepository, UserReadOnlyRepository>()
+            .AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
     }
     

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Interfaces;
 using Infrastructure.Encryption;
 using Infrastructure.Identity;
@@ -16,8 +17,11 @@ public static class ServiceCollectionExtensions
     private static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(TimeProvider.System);
+        services.AddMemoryCache();
+        services.AddSingleton<ICacheService, CacheService>();
+        services.AddScoped<IEmailService, EmailService>(s => new EmailService(configuration));
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IPasswordEncryptor, PasswordEncryptor>();
+        services.AddScoped<IHashingService, HashingService>();
         services.AddScoped<ISymmetricKeyEncryptor, SymmetricKeyEncryptor>();
         services.AddScoped<IMessageEncryptor, MessageEncryptor>();
     }

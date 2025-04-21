@@ -4,6 +4,7 @@ import { IChat } from '@/models/chat'
 import { IChatSummary } from '@/models/chatSummary'
 import { IMessage } from '@/models/message'
 import { create } from 'zustand'
+
 interface ChatStore {
 	chats: IChatSummary[]
 	currentChatId: string | null

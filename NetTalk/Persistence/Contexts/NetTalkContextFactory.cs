@@ -8,7 +8,7 @@ public class NetTalkContextFactory : IDesignTimeDbContextFactory<NetTalkDbContex
     public NetTalkDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<NetTalkDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=net-talk-db;Username=postgres;Password=root");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=net-talk-v-1.0;Username=postgres;Password=root");
         
         return new NetTalkDbContext(optionsBuilder.Options);
     }

@@ -12,8 +12,8 @@ using Persistence.Contexts;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(NetTalkDbContext))]
-    [Migration("20250109005444_InitMigration")]
-    partial class InitMigration
+    [Migration("20250520160848_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,8 +51,9 @@ namespace Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("created_by");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("chat_type");
 
                     b.Property<DateTime?>("UpdatedDate")
@@ -153,9 +154,6 @@ namespace Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChatId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -164,18 +162,20 @@ namespace Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id_chat");
 
-                    b.Property<string>("Text")
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_user");
+
+                    b.Property<byte[]>("Text")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("text");
+                        .HasColumnType("bytea")
+                        .HasColumnName("message");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChatId");
 
                     b.HasIndex("IdChat");
 
@@ -210,6 +210,37 @@ namespace Persistence.Migrations
                     b.ToTable("message_statuses");
                 });
 
+            modelBuilder.Entity("Domain.Entities.SymmetricKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("IV")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("iv");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_user");
+
+                    b.Property<byte[]>("Key")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("crypto_key");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdUser")
+                        .IsUnique();
+
+                    b.ToTable("crypto_keys");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -219,7 +250,7 @@ namespace Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvtarUrl")
+                    b.Property<string>("AvatarUrl")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("avatar_url");
@@ -247,6 +278,11 @@ namespace Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password");
 
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("salt");
+
                     b.HasKey("Id");
 
                     b.ToTable("users");
@@ -254,15 +290,15 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("users_chats", b =>
                 {
-                    b.Property<int>("ChatId")
+                    b.Property<int>("id_chat")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("id_user")
                         .HasColumnType("integer");
 
-                    b.HasKey("ChatId", "UserId");
+                    b.HasKey("id_chat", "id_user");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("id_user");
 
                     b.ToTable("users_chats");
                 });
@@ -280,10 +316,6 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany("Messages")
-                        .HasForeignKey("ChatId");
-
-                    b.HasOne("Domain.Entities.Chat", null)
-                        .WithMany()
                         .HasForeignKey("IdChat")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -298,17 +330,26 @@ namespace Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.SymmetricKey", b =>
+                {
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithOne("Key")
+                        .HasForeignKey("Domain.Entities.SymmetricKey", "IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("users_chats", b =>
                 {
                     b.HasOne("Domain.Entities.Chat", null)
                         .WithMany()
-                        .HasForeignKey("ChatId")
+                        .HasForeignKey("id_chat")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("id_user")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -323,6 +364,12 @@ namespace Persistence.Migrations
                     b.Navigation("Files");
 
                     b.Navigation("StatusList");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("Key")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,7 +37,7 @@ namespace Persistence.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     chat_name = table.Column<string>(type: "text", nullable: false),
-                    chat_type = table.Column<int>(type: "integer", nullable: false),
+                    chat_type = table.Column<string>(type: "text", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_by = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -57,6 +57,7 @@ namespace Persistence.Migrations
                     login = table.Column<string>(type: "text", nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
                     full_name = table.Column<string>(type: "text", nullable: false),
+                    salt = table.Column<string>(type: "text", nullable: false),
                     avatar_url = table.Column<string>(type: "text", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     last_online = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -73,19 +74,14 @@ namespace Persistence.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     id_chat = table.Column<int>(type: "integer", nullable: false),
-                    text = table.Column<string>(type: "text", nullable: false),
-                    ChatId = table.Column<int>(type: "integer", nullable: true),
+                    message = table.Column<byte[]>(type: "bytea", nullable: false),
+                    id_user = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_messages", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_messages_chats_ChatId",
-                        column: x => x.ChatId,
-                        principalTable: "chats",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_messages_chats_id_chat",
                         column: x => x.id_chat,
@@ -95,24 +91,45 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "users_chats",
+                name: "crypto_keys",
                 columns: table => new
                 {
-                    ChatId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id_user = table.Column<int>(type: "integer", nullable: false),
+                    iv = table.Column<byte[]>(type: "bytea", nullable: false),
+                    crypto_key = table.Column<byte[]>(type: "bytea", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users_chats", x => new { x.ChatId, x.UserId });
+                    table.PrimaryKey("PK_crypto_keys", x => x.id);
                     table.ForeignKey(
-                        name: "FK_users_chats_chats_ChatId",
-                        column: x => x.ChatId,
+                        name: "FK_crypto_keys_users_id_user",
+                        column: x => x.id_user,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users_chats",
+                columns: table => new
+                {
+                    id_chat = table.Column<int>(type: "integer", nullable: false),
+                    id_user = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_users_chats", x => new { x.id_chat, x.id_user });
+                    table.ForeignKey(
+                        name: "FK_users_chats_chats_id_chat",
+                        column: x => x.id_chat,
                         principalTable: "chats",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_users_chats_users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_users_chats_users_id_user",
+                        column: x => x.id_user,
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -164,6 +181,12 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_crypto_keys_id_user",
+                table: "crypto_keys",
+                column: "id_user",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_files_id_message",
                 table: "files",
                 column: "id_message");
@@ -174,19 +197,14 @@ namespace Persistence.Migrations
                 column: "id_message");
 
             migrationBuilder.CreateIndex(
-                name: "IX_messages_ChatId",
-                table: "messages",
-                column: "IdChat");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_messages_id_chat",
                 table: "messages",
                 column: "id_chat");
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_chats_UserId",
+                name: "IX_users_chats_id_user",
                 table: "users_chats",
-                column: "UserId");
+                column: "id_user");
         }
 
         /// <inheritdoc />
@@ -194,6 +212,9 @@ namespace Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "chat_invites");
+
+            migrationBuilder.DropTable(
+                name: "crypto_keys");
 
             migrationBuilder.DropTable(
                 name: "files");

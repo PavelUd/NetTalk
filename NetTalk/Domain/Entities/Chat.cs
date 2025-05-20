@@ -18,7 +18,8 @@ public class Chat : BaseAuditableEntity
     
     [Column("created_by")]
     public int Owner { get; set; }
-
+    
     public List<Message> Messages { get; set; }
+    
     public List<User> Users { get; set; }
 }

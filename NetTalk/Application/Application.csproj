@@ -8,8 +8,6 @@
 
     <ItemGroup>
       <Folder Include="Authentication\Dto\" />
-      <Folder Include="Commands\" />
-      <Folder Include="Queries\" />
     </ItemGroup>
 
     <ItemGroup>

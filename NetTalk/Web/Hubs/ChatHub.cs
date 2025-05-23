@@ -9,12 +9,10 @@ namespace NetTalk.Hubs;
 public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
-    private readonly IMessageEncryptor _encryptor;
 
-    public ChatHub(IMediator mediator, IMessageEncryptor encryptor)
+    public ChatHub(IMediator mediator)
     {
         _mediator = mediator;
-        _encryptor = encryptor;
     }
 
     public async Task JoinPrivateChat(string chatId)
@@ -59,7 +57,28 @@ public class ChatHub : Hub
        var result = await _mediator.Send(query);
        await Clients.Group($"Chat{idChat}").SendAsync("ReceiveMessage",  JsonConvert.SerializeObject(result.Data));
     }
+
+    public async Task UpdateMessage(string idChat, string idMessage, string message)
+    {
+        var query = new UpdateMessageCommand()
+        {
+            IdMessage = int.Parse(idMessage),
+            Text = message
+        };
+        var result = await _mediator.Send(query);
+        await Clients.Group($"Chat{idChat}").SendAsync("ReceiveUpdateMessage", JsonConvert.SerializeObject(result.Data));
+    }
     
+    public async Task DeleteMessage(string idChat, string idMessage)
+    {
+        var query = new DeleteMessageCommand()
+        {
+            IdMessage = int.Parse(idMessage),
+        };
+        var result = await _mediator.Send(query);
+        await Clients.Group($"Chat{idChat}").SendAsync("ReceiveDeleteMessage", JsonConvert.SerializeObject(idMessage));
+    }
+
     public override async Task OnConnectedAsync()
     {
         var userId = Context.User!.Claims.FirstOrDefault(cl => cl.Type == "Id")?.Value;

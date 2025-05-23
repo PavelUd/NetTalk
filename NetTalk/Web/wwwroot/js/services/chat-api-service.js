@@ -36,7 +36,30 @@ export default class ChatAPIService extends ApiService
         this.#connection.invoke("SendMessage", id.toString(), message)
             .catch(err => console.error(err.toString()));
     }
+
+    async updateMessage(text,idMessage, id){
+        this.#connection.invoke("UpdateMessage", id.toString(),idMessage.toString(), text)
+            .catch(err => console.error(err.toString()));
+    }
+
+    async deleteMessage(id, idMessage){
+        this.#connection.invoke("DeleteMessage", id.toString(), idMessage.toString())
+            .catch(err => console.error(err.toString()));
+    }
     
+    receiveDeleteMessage(callback){
+        this.#connection.off("ReceiveDeleteMessage");
+        this.#connection.on("ReceiveDeleteMessage", (data) => {
+            callback(data)
+        });
+    }
+
+    receiveUpdateMessage(callback){
+        this.#connection.off("ReceiveUpdateMessage");
+        this.#connection.on("ReceiveUpdateMessage", (data) => {
+            callback(data)
+        });
+    }
    
     receive(callback) {
         this.#connection.off("ReceiveMessage");

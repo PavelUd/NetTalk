@@ -104,13 +104,26 @@ export default class ChatPresenter{
     
    #renderMessage = (message) =>{
        const messagePresenter = new MessagePresenter({
-           container: this.#container
+           container: this.#container,
+           onDelete: this.#onDelete,
+           onUpdate: this.#onUpdate
        });
        let type = this.#user.Id == message.user.idUser ? "self" : "other"
        messagePresenter.init(message, type);
        this.#messagePresenters.set(message.id,  messagePresenter);
    }
 
+   #onDelete = (id) => {
+       this.#messagesModel.deleteMsg(id);
+   }
+   
+   #onUpdate = (id, text) =>{
+        if(text === ""){
+            this.#messagesModel.deleteMsg(id);
+        }
+       this.#messagesModel.sendUpdateMessage(id, text);
+   }
+   
     #handleNewPointClick = (message) => {
         this.#messagesModel.send(message);
     }

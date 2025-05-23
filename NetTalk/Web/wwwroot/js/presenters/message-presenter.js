@@ -6,15 +6,21 @@ export default class MessagePresenter{
     #container;
     #message;
     #messageElement;
-    constructor({container}) {
+    #onDelete
+    #onUpdate
+    constructor({container, onDelete, onUpdate}) {
         this.#container = container;
+        this.#onDelete = onDelete;
+        this.#onUpdate = onUpdate;
     }
 
     init(message, type) {
         this.#message = message;
         if(type === 'self') {
             this.#messageElement = new MessageView({
-                message: this.#message
+                message: this.#message,
+                onDelete: this.#onDelete,
+                onUpdate: this.#onUpdate
             });
         }
         else{

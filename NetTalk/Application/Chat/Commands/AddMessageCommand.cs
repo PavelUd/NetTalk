@@ -19,18 +19,14 @@ public record AddMessageCommand : IRequest<Result<MessageDto>>
 internal class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Result<MessageDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IUser _user;
     private readonly IMessageEncryptor _encryptor;
-    private readonly IMediator _mediator;
 
-    public AddMessageCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IUser user, IMessageEncryptor encryptor, IMediator mediator)
+    public AddMessageCommandHandler(IUnitOfWork unitOfWork, IUser user, IMessageEncryptor encryptor)
     {
-        _mapper = mapper;
         _unitOfWork = unitOfWork;
         _user = user;
         _encryptor = encryptor;
-        _mediator = mediator;
     }
 
     public async Task<Result<MessageDto>> Handle(AddMessageCommand request, CancellationToken cancellationToken)

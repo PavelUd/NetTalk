@@ -32,6 +32,8 @@ export default class MessageModel extends Observable
          this.#info = {name: messages.data.name, url:messages.data.url }
          await this.#service.joinChat(this.#id);
          this.#service.receive(this.add.bind(this));
+         this.#service.receiveUpdateMessage(this.handleReceivedUpdateMessage.bind(this));
+         this.#service.receiveDeleteMessage(this.handleReceivedDeleteMessage.bind(this));
          this._notify(UpdateType.INIT, {isError : false, idChat: id});
     }            
     catch (error) {
@@ -50,6 +52,14 @@ export default class MessageModel extends Observable
     async send(message) {
         await this.#service.send(message, this.#id);
     }
+    
+    async deleteMsg(id){
+        await this.#service.deleteMessage(this.#id, id);
+    }
+    
+    async sendUpdateMessage(id, text){
+        await this.#service.updateMessage(text,id, this.#id);
+    }
 
     async destroy(){
         if(!this.#id){
@@ -63,12 +73,30 @@ export default class MessageModel extends Observable
     async createChat(data, users){
        await this.#service.create(data, users);
        this.#service.receive(this.add.bind(this));
+        this.#service.receiveUpdateMessage(this.handleReceivedUpdateMessage.bind(this));
+        this.#service.receiveDeleteMessage(this.handleReceivedDeleteMessage.bind(this));
     }
     
     add(message) {
         let msg = adaptToClient(JSON.parse(message));
         let type = UpdateType.MAJOR;
         this.#messages.push(msg);
+        this._notify(type, {isError : false });
+    }
+
+    handleReceivedUpdateMessage(message) {
+        let msg = adaptToClient(JSON.parse(message));
+        let type = UpdateType.MAJOR;
+        const index = this.#messages.findIndex(m => m.id === msg.id);
+        if (index !== -1) {
+            this.#messages[index] = msg;
+        }
+        this._notify(type, {isError : false });
+    }
+    
+    handleReceivedDeleteMessage(id) {
+        let type = UpdateType.MAJOR;
+        this.#messages = this.#messages.filter(msg => String(msg.id) !== JSON.parse(id));
         this._notify(type, {isError : false });
     }
     

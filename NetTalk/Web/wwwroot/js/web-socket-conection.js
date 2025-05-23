@@ -58,6 +58,26 @@ connection.on("ReceiveMessage", (data, url) => {
     container.scrollTop = container.scrollHeight;
 });
 
+connection.on("UpdateMessage", (data, url) => {
+    const messagesList = document.getElementById("messagesList");
+    const container = document.getElementById("container");
+    const message = JSON.parse(data);
+    const us = JSON.parse(localStorage.getItem('user'));
+    const msgDiv = message.IdUser == us.Id ? initSelfMessage(message, url) : initOtherMessage(message, url);
+    messagesList.innerHTML += msgDiv;
+    container.scrollTop = container.scrollHeight;
+});
+
+connection.on("DeleteMessage", (data, url) => {
+    const messagesList = document.getElementById("messagesList");
+    const container = document.getElementById("container");
+    const message = JSON.parse(data);
+    const us = JSON.parse(localStorage.getItem('user'));
+    const msgDiv = message.IdUser == us.Id ? initSelfMessage(message, url) : initOtherMessage(message, url);
+    messagesList.innerHTML += msgDiv;
+    container.scrollTop = container.scrollHeight;
+});
+
 document.getElementById("sendMessageButton").addEventListener("click", () => {
     const messageElement = document.getElementById("exampleFormControlInput2");
     const message = messageElement.value;

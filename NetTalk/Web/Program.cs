@@ -30,9 +30,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+//app.UseHttpsRedirection();
+//"https://localhost:7235;
 
+app.UseStaticFiles();
 app.UseRouting();
 app.UseStaticFiles();
 

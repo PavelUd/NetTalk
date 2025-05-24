@@ -4,7 +4,7 @@ import AuthView from "./views/auth-view.js";
 import AuthPresenter from "./presenters/auth-presenter.js";
 
 
-const END_POINT = "https://localhost:7235"
+const END_POINT = window.location.origin
 
 const service = new AuthApiService(END_POINT, "");
 const model = new AuthModel(service);

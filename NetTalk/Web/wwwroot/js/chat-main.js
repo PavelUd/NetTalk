@@ -8,7 +8,7 @@ import ChatSummaryModel from "./models/chat-model.js";
 import NavPresenter from "./presenters/nav-presenter.js";
 
 
-const END_POINT = "https://localhost:7235";
+const END_POINT = window.location.origin;
 const chatContainer = document.getElementById("messagesList");
 const summariesContainer = document.querySelector('.summary-list')
 const inputButtonContainer = document.getElementById('input');

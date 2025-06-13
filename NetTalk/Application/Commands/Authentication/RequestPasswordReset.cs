@@ -24,4 +24,4 @@ public class RequestPasswordResetCommandHandler(IAuthenticationService authentic
             return await Result<string>.SuccessAsync(ex.Message);
         }
     }
-}
+} 

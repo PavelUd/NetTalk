@@ -1,4 +1,13 @@
 namespace Domain.Events.Message;
 
-public class MessageUpdatedEvent(Guid  aggregateId, Guid  idChat, byte[] text, Guid idUser)
-    : MessageBaseEvent(aggregateId, idChat, text, idUser);
+
+public class MessageUpdatedEvent(Guid id, Guid idChat, byte[] text, Guid idUser, DateTime? updatedDate,
+    DateTime? createdDate)
+    : MessageBaseEvent(id, idChat, text, idUser)
+{
+    public DateTime? UpdatedDate { get; set; } = updatedDate;
+
+    public DateTime? CreatedDate { get; set; } = createdDate;
+    
+    public bool IsPinned { get; set; } = false;
+}

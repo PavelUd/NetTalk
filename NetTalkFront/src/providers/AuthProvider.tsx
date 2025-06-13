@@ -1,34 +1,45 @@
-'use client'
-
-import { useAuth } from '@/hooks/useAuth'
+import { $fetch } from '@/api/api.fetch'
+import { useAuthStore } from '@/features/auth/model/authStore'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 export default function AuthProvider({ children }: PropsWithChildren<unknown>) {
-	const { user, isLoggedIn } = useAuth()
+	const { accessToken, setAccessToken } = useAuthStore()
 	const pathname = usePathname()
 	const router = useRouter()
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		// Сохраняем JWT токен в localStorage при изменении user
-		if (user) {
-			window.localStorage.setItem('token', user.jwt || '')
+		const checkAuth = async () => {
+			try {
+				if (accessToken) {
+					console.log(accessToken)
+					return
+				}
+				const result = await $fetch.post(
+					'auth/refresh',
+					undefined,
+					false,
+					undefined,
+					true
+				)
+				console.log(result)
+				setAccessToken(result.data)
+			} catch (err) {
+				console.log(err)
+				if (pathname !== '/login' && pathname !== '/register') {
+					router.replace('/login')
+				}
+			} finally {
+				setLoading(false)
+			}
 		}
-	}, [user, isLoggedIn])
 
-	useEffect(() => {
-		// Проверка токена и редирект, если нет токена
-		const token = window.localStorage.getItem('token')
-		if (!token && pathname !== '/login' && pathname !== '/register') {
-			router.replace('/login')
-		} else {
-			setLoading(false)
-		}
-	}, [pathname, isLoggedIn, router])
+		checkAuth()
+	}, [pathname, router, setAccessToken])
 
 	if (loading) {
-		return <div>Loading...</div> // Или спиннер, чтобы пользователь не видел пустую страницу
+		return <div>Loading...</div> // можно заменить на спиннер
 	}
 
 	return <>{children}</>

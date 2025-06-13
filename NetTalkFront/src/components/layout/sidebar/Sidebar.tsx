@@ -1,5 +1,7 @@
 'use client'
 
+import { usePeopleModalStore } from '@/features/users/store/peopleModalStore'
+import ModalWindow from '@/features/users/ui/PeopleModal'
 import Image from 'next/image'
 import { BiSolidMessageMinus } from 'react-icons/bi'
 import { BsBookmarkDashFill } from 'react-icons/bs'
@@ -9,6 +11,8 @@ import { RiGroupFill, RiSettingsLine } from 'react-icons/ri'
 import styles from './Sidebar.module.scss'
 
 export function Sidebar() {
+	const open = usePeopleModalStore(state => state.open)
+
 	return (
 		<aside className={styles.sidebar}>
 			<div>
@@ -42,7 +46,10 @@ export function Sidebar() {
 						}}
 					/>
 				</div>
-				<div className='border-b-2 border-[#2a2931] p-4 mt-4 mb-4'>
+				<div
+					className='border-b-2 border-[#2a2931] p-4 mt-4 mb-4'
+					onClick={open}
+				>
 					<RiGroupFill
 						size={24}
 						style={{
@@ -65,6 +72,7 @@ export function Sidebar() {
 						/>
 					</div>
 				</div>
+				<ModalWindow />
 			</div>
 		</aside>
 	)

@@ -1,6 +1,6 @@
 'use client'
-import { Confirm } from '@/components/screens/auth/Confirm'
-import { Register } from '@/components/screens/auth/Register'
+import { Confirm } from '@/features/auth/ui/ConfirmPage'
+import { Register } from '@/features/auth/ui/RegisterPage'
 import { AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 

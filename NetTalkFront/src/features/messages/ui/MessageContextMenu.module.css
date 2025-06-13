@@ -1,0 +1,45 @@
+.react-contexify__theme--dark {
+	background-color: rgba(42, 47, 58, 0.95) !important;
+	border: 1px solid rgba(58, 63, 75, 0.9);
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	padding: 4px 0;
+	font-family: 'Segoe UI', sans-serif;
+	color: #fff;
+	min-width: 160px;
+	backdrop-filter: blur(4px);
+}
+
+.react-contexify__item {
+	padding: 8px 16px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+	font-size: 14px;
+	font-weight: 600; /* жирный текст */
+	background-color: transparent;
+}
+
+.react-contexify__item:hover {
+	background-color: rgba(255, 255, 255, 0.08);
+}
+
+.react-contexify__item__content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.react-contexify__separator {
+	height: 1px;
+	margin: 4px 0;
+	background-color: rgba(58, 63, 75, 0.6);
+}
+
+/* Красный пункт меню — удалить */
+.react-contexify__item--delete {
+	color: #f44336; /* красный как в Telegram */
+}
+
+.react-contexify__item--delete:hover {
+	background-color: rgba(244, 67, 54, 0.1);
+}

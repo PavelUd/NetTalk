@@ -45,6 +45,6 @@ public class Message : BaseAuditableEntity
 
     public void MarkAsUpdated()
     {
-        AddDomainEvent(new MessageUpdatedEvent(Id, IdChat,Text, IdUser));
+        AddDomainEvent(new MessageUpdatedEvent(Id, IdChat,Text, IdUser, UpdatedDate, CreatedDate));
     }
 }

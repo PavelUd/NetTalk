@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
-import { Auth } from '@/components/screens/auth/Auth'
 import { NO_INDEX_PAGE } from '@/const/seo.const'
+import { Auth } from '@/features/auth/ui/SignInPage'
 
 export const metadata: Metadata = {
 	title: 'Login',

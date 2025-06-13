@@ -1,5 +1,6 @@
+import { useAuthStore } from '@/features/auth/model/authStore'
 class FetchClient {
-	private API_URL = 'http://127.0.0.1:5209/' as string
+	private API_URL = 'http://localhost:5209/api/' as string
 	constructor(private defaultHeaders: Record<string, string> = {}) {}
 
 	async get<T>(
@@ -14,9 +15,10 @@ class FetchClient {
 		path: string,
 		body?: Record<string, unknown>,
 		isAuth: boolean = false,
-		headers?: Record<string, string>
+		headers?: Record<string, string>,
+		isCredentials: boolean = false
 	): Promise<T> {
-		return this.fetch<T>(path, 'POST', isAuth, body, headers)
+		return this.fetch<T>(path, 'POST', isAuth, body, headers, isCredentials)
 	}
 
 	async put<T>(
@@ -31,6 +33,7 @@ class FetchClient {
 	async delete<T>(
 		path: string,
 		isAuth: boolean = false,
+
 		headers?: Record<string, string>
 	): Promise<T> {
 		return this.fetch<T>(path, 'DELETE', isAuth, undefined, headers)
@@ -50,25 +53,26 @@ class FetchClient {
 		method: string,
 		isAuth: boolean,
 		body?: Record<string, unknown>,
-		headers?: Record<string, string>
+		headers?: Record<string, string>,
+		isCredentials: boolean = false
 	): Promise<T> {
 		const url = `${this.API_URL}${path}`
-		const authorizationHeader: HeadersInit = isAuth
-			? { Authorization: `Bearer ${localStorage.getItem('token')}` }
-			: {}
+		const { accessToken, setAccessToken } = useAuthStore.getState()
 
 		try {
 			const response = await fetch(url, {
 				method,
+				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 					...this.defaultHeaders,
-					...authorizationHeader,
+					...(isAuth && accessToken
+						? { Authorization: `Bearer ${accessToken}` }
+						: {}),
 					...headers,
 				},
 				body: body ? JSON.stringify(body) : null,
 			})
-
 			const data = await response.json()
 
 			if (!response.ok) {
@@ -76,6 +80,24 @@ class FetchClient {
 			}
 
 			return data
+		} catch (error) {
+			throw new Error(error)
+		}
+	}
+	private async tryRefreshToken(
+		setAccessToken: (token: string | null) => void
+	): Promise<string> {
+		try {
+			const refreshRes = await this.post<string>(
+				`auth/refresh`,
+				'',
+				false,
+				null,
+				true
+			)
+			const { accessToken: newToken } = refreshRes.data
+			setAccessToken(newToken)
+			return newToken
 		} catch (error) {
 			throw new Error(error)
 		}

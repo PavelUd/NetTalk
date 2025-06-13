@@ -4,6 +4,7 @@ export interface IMessage {
 	id: string
 	idUser: string
 	text: string
-	createdAt: string
+	createdDate: string
+	updatedDate: string
 	sender?: IUser
 }

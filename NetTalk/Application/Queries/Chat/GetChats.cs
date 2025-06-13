@@ -46,12 +46,12 @@ internal class GetChatsQueryQueryHandler : IRequestHandler<GetChatsQuery, Result
                 {
                     chat.LastMessage.Text = DecodeMessage(chat.LastMessage);
                 }
-                if (chat.Type != "direct")
+                if (chat.Type != "Personal")
                     continue;
 
                 var otherUserId = chat.Participants.First(id => id != _user.Id);
                 var otherUser = await _userRepository.GetByIdAsync(otherUserId);
-                chat.Name = otherUser.Username;
+                chat.Name = otherUser.Email;
 
                 chat.Url = otherUser.Avatar;
             }

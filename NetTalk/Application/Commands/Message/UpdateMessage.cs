@@ -87,6 +87,7 @@ public class UpdateMessageHandler : IRequestHandler<UpdateMessage, Result<Messag
     private async Task UpdateMessage(Domain.Entities.Message message, byte[] newText, CancellationToken cancellationToken)
     {
         message.Text = newText;
+        message.UpdatedDate = DateTime.Now.ToUniversalTime();
         await _repository.UpdateAsync(message);
         await UpdateChatLastMessage(message.IdChat, message, cancellationToken);
         await _unitOfWork.SaveChangesAsync();

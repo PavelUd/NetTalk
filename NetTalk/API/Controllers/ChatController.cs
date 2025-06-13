@@ -26,6 +26,8 @@ public class ChatController : Controller
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    ///
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetChatById(Guid  id)
     {

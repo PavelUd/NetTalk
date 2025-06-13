@@ -22,11 +22,12 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
     private readonly IMessageEncryptor _messageEncryptor;
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IUser _user;
     private readonly IChatReadOnlyRepository _chatRepository;
     private readonly IMessageReadOnlyRepository _messageRepository;
     private readonly IUserReadOnlyRepository _userRepository;
 
-    public GetOfficeByIdQueryHandler(IMessageEncryptor messageEncryptor,IUserRepository writeUserRepository, IMapper mapper, IChatReadOnlyRepository repository, IMessageReadOnlyRepository messageRepository, IUserReadOnlyRepository userRepository)
+    public GetOfficeByIdQueryHandler(IMessageEncryptor messageEncryptor,IUserRepository writeUserRepository, IMapper mapper, IChatReadOnlyRepository repository, IMessageReadOnlyRepository messageRepository, IUserReadOnlyRepository userRepository, IUser user)
     {
         _messageEncryptor = messageEncryptor;
         _repository = writeUserRepository;
@@ -34,6 +35,7 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
         _chatRepository = repository;
         _messageRepository = messageRepository;
         _userRepository = userRepository;
+        _user = user;
     }
 
     public async Task<Result<ChatDto>> Handle(GetChatByIdQuery request, CancellationToken cancellationToken)
@@ -45,6 +47,10 @@ internal class GetOfficeByIdQueryHandler : IRequestHandler<GetChatByIdQuery, Res
             var members = await GetChatMembers(chat.Participants);
             var chatDto = _mapper.Map<ChatDto>(chat);
             chatDto.Users = members;
+            if (chatDto.Type == "Personal")
+            {
+                chatDto.Name = members.First(us => us.Id != _user.Id).Email;
+            }
             chatDto.Messages = chatMessages.Select(DecodeMessage).ToList();
             
             return await Result<ChatDto>.SuccessAsync(chatDto);

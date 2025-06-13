@@ -1,5 +1,6 @@
 using Application.Queries.User;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -20,10 +21,14 @@ public class UserController : Controller
     /// Возврат пользователелей
     /// </summary>
     /// <returns></returns>
+    [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetUsers()
+    public async Task<IActionResult> GetUsers(string? login)
     {
-        var query = new GetAllUsersQuery();
+        var query = new GetAllUsersQuery()
+        {
+            Login = login
+        };
         var result = await _mediator.Send(query);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }

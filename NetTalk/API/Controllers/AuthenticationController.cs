@@ -1,5 +1,6 @@
 using Application.Authentication.Command;
 using Application.Commands.Authentication;
+using Application.Common.Result;
 using Application.Queries.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,25 +36,56 @@ public class AuthenticationController : Controller
          
         var token = await _mediator.Send(query);
 
-        if (token.Succeeded)
+        if (!token.Succeeded) 
+            return Unauthorized(new { message = "Неверный логин или пароль" });
+        
+        var refreshToken = token.Data.RefreshToken;
+        var cookieOptions = new CookieOptions
         {
-            return Ok(token);
-        }
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
 
-        return Unauthorized(new { message = "Неверный логин или пароль" });
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        var result = new Result<string>()
+        {
+            Data = token.Data.AccessToken,
+        };
+        return Ok(result);
+
     }
-    [HttpPost("refresh-token")]
-    public async Task<IActionResult> Authenticate([FromBody] RefreshTokenLogin query)
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Authenticate()
     {
-         
+        var oldRefreshToken = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(oldRefreshToken))
+            return Unauthorized();
+        var query = new RefreshTokenLogin()
+        {
+            RefreshToken = oldRefreshToken
+        };
         var token = await _mediator.Send(query);
 
-        if (token.Succeeded)
+        if (!token.Succeeded)
+            return Unauthorized(new { message = "Неверный логин или пароль" });
+        
+        var refreshToken = token.Data.RefreshToken;
+        var cookieOptions = new CookieOptions
         {
-            return Ok(token);
-        }
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        var result = new Result<string>()
+        {
+            Data = token.Data.AccessToken,
+        };
+        return Ok(result);
 
-        return Unauthorized(new { message = "Неверный логин или пароль" });
     }
 
     
@@ -68,12 +100,23 @@ public class AuthenticationController : Controller
     {
         var token = await _mediator.Send(query);
 
-        if (token.Succeeded)
+        if (!token.Succeeded) 
+            return BadRequest(new { message = token.Errors });
+        
+        var refreshToken = token.Data.RefreshToken;
+        var cookieOptions = new CookieOptions
         {
-            return Ok(token);
-        }
-
-        return BadRequest(new { message = token.Errors });
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        var result = new Result<string>()
+        {
+            Data = token.Data.AccessToken,
+        };
+        return Ok(result);
     }
         
     [HttpPost("register")]

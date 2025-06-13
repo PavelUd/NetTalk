@@ -8,7 +8,7 @@ namespace Application.Commands.Chat.Dto;
 public class ChatDto
 {
     public Guid Id { get; init; }
-    public string Name { get; init; }
+    public string Name { get; set; }
     public string Url { get; init; }
     public bool IsActive { get; set; }
     public Guid Owner { get; set; }

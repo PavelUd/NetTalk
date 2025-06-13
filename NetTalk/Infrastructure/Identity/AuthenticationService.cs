@@ -200,6 +200,7 @@ public class AuthenticationService : IAuthenticationService
             oldRefreshToken.Token = hashToken;
             oldRefreshToken.UpdatedDate = DateTime.Now.ToUniversalTime();
             await  _refreshTokenRepository.UpdateAsync(oldRefreshToken);
+            await _unitOfWork.SaveChangesAsync();
             return;
         }
         

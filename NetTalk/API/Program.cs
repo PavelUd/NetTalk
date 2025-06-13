@@ -29,7 +29,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost3000",
         builder => builder.WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
@@ -51,21 +52,39 @@ builder.Services.Configure<Token>(builder.Configuration.GetSection("token"));
 builder.Services.Configure<ConnectionOptions>(builder.Configuration.GetSection(ConnectionOptions.ConfigSectionPath));
 builder.Services.AddScoped<IUser, IdentityUser>();
 builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.RequireHttpsMetadata = false;
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["token:secret"])),
-        ValidateIssuer = false,
-        ValidateAudience = false
-    };
-});
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x =>
+    {
+        x.RequireHttpsMetadata = false;
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["token:secret"])),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+        
+        x.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    (path.StartsWithSegments("/chatlisthub") || path.StartsWithSegments("/chathub") ))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -118,6 +137,11 @@ app.UseAuthentication();
 app.MapControllers();
 app.UseRouting();
 app.UseAuthorization();
-app.UseEndpoints(endpoints => { endpoints.MapHub<ChatHub>("/chathub"); });
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<ChatHub>("/chathub");
+    endpoints.MapHub<ChatListHub>("/chatlisthub");
+});
 app.UseHttpsRedirection();
 app.Run();
